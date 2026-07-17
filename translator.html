@@ -1,592 +1,239 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kimi Translator & Grammar Correction</title>
-  <style>
-    :root {
-      --bg: #ffffff;
-      --bg-card: #f5f5f5;
-      --bg-input: #fafafa;
-      --border: #e0e0e0;
-      --text: #1a1a1a;
-      --text-secondary: #666666;
-      --text-muted: #999999;
-      --accent: #000000;
-      --accent-text: #ffffff;
-      --tone-active: #000000;
-      --tone-active-text: #ffffff;
-      --tone-inactive: transparent;
-      --tone-inactive-text: #666666;
-      --tone-border: #e0e0e0;
-      --result-border: #e0e0e0;
-      --copy-border: #cccccc;
-    }
-    [data-theme="dark"] {
-      --bg: #0a0a0a;
-      --bg-card: #141414;
-      --bg-input: #0f0f0f;
-      --border: #2a2a2a;
-      --text: #e5e5e5;
-      --text-secondary: #a0a0a0;
-      --text-muted: #525252;
-      --accent: #ffffff;
-      --accent-text: #000000;
-      --tone-active: #e5e5e5;
-      --tone-active-text: #000000;
-      --tone-inactive: transparent;
-      --tone-inactive-text: #525252;
-      --tone-border: #2a2a2a;
-      --result-border: #2a2a2a;
-      --copy-border: #333333;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding: 24px 16px;
-      max-width: 680px;
-      margin: 0 auto;
-      transition: background 0.2s, color 0.2s;
-    }
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
-    .lang-bar {
-      display: flex;
-      gap: 6px;
-    }
-    .lang-bar button, .theme-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      padding: 4px 12px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .lang-bar button.active {
-      background: var(--accent);
-      color: var(--accent-text);
-      border-color: var(--accent);
-    }
-    .theme-btn {
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .mode-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 28px;
-    }
-    .mode-tab {
-      flex: 1;
-      text-align: center;
-      padding: 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 500;
-      transition: all 0.15s;
-    }
-    .mode-tab.active {
-      background: var(--accent);
-      color: var(--accent-text);
-      border-color: var(--accent);
-    }
-    .section { display: none; }
-    .section.active { display: block; }
-    .label {
-      font-size: 11px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .sublabel {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-    .tone-wrap { margin-bottom: 20px; }
-    .tone-bar {
-      display: flex;
-      border: 1px solid var(--tone-border);
-      background: var(--bg);
-    }
-    .tone-option {
-      flex: 1;
-      text-align: center;
-      padding: 10px 4px;
-      color: var(--tone-inactive-text);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      border-right: 1px solid var(--tone-border);
-      transition: all 0.15s;
-      user-select: none;
-    }
-    .tone-option:last-child { border-right: none; }
-    .tone-option.active {
-      background: var(--tone-active);
-      color: var(--tone-active-text);
-    }
-    textarea {
-      width: 100%;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px;
-      font-size: 14px;
-      font-family: inherit;
-      resize: vertical;
-      outline: none;
-      line-height: 1.5;
-      transition: border-color 0.15s;
-    }
-    textarea:focus { border-color: var(--text-muted); }
-    textarea::placeholder { color: var(--text-muted); }
-    .box-small { min-height: 80px; margin-bottom: 16px; }
-    .box-large { min-height: 160px; margin-bottom: 12px; }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      color: var(--accent-text);
-      border: none;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn:hover { opacity: 0.85; }
-    .btn:active { transform: scale(0.998); }
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 24px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-    .loading.show { display: block; }
-    .result-box {
-      display: none;
-      margin-top: 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--result-border);
-      padding: 16px;
-    }
-    .result-box.show { display: block; }
-    .result-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--result-border);
-    }
-    .result-title {
-      font-size: 11px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 600;
-    }
-    .copy-btn {
-      background: transparent;
-      border: 1px solid var(--copy-border);
-      color: var(--text-secondary);
-      padding: 4px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .copy-btn:hover { border-color: var(--text-muted); color: var(--text); }
-    .result-body {
-      white-space: pre-wrap;
-      font-size: 14px;
-      line-height: 1.7;
-      color: var(--text);
-    }
-    .result-body strong { color: var(--text); font-weight: 700; }
-    .result-body ul { margin: 8px 0; padding-left: 20px; }
-    .result-body li { margin: 4px 0; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <div class="top-bar">
     <div class="lang-bar">
-      <button id="btn-zh" class="active">中文</button>
+      <button id="btn-zh">中文</button>
       <button id="btn-en">EN</button>
     </div>
     <button class="theme-btn" id="btn-theme" title="Toggle dark mode">&#9788;</button>
   </div>
 
   <div class="mode-bar">
-    <div id="tab-translate" class="mode-tab active"> 翻译</div>
-    <div id="tab-grammar" class="mode-tab">语法纠错</div>
+    <div id="tab-translate" class="mode-tab active">Translate</div>
+    <div id="tab-grammar" class="mode-tab">Grammar Check</div>
   </div>
 
   <div id="sec-translate" class="section active">
     <div class="tone-wrap">
-      <div class="sublabel">语气</div>
-      <div class="tone-bar">
-        <div class="tone-option" data-tone="casual">Casual</div>
-        <div class="tone-option active" data-tone="natural">Natural</div>
-        <div class="tone-option" data-tone="formal">Formal</div>
+      <div class="sublabel">Tone</div>
+      <div class="tone-slider">
+        <div class="tone-track"></div>
+        <div class="tone-dots">
+          <div class="tone-item" data-tone="casual2">
+            <div class="tone-dot"></div>
+            <div class="tone-label">Casual II</div>
+          </div>
+          <div class="tone-item label-below" data-tone="casual1">
+            <div class="tone-dot"></div>
+            <div class="tone-label">Casual I</div>
+          </div>
+          <div class="tone-item active" data-tone="natural">
+            <div class="tone-dot"></div>
+            <div class="tone-label">Natural</div>
+          </div>
+          <div class="tone-item label-below" data-tone="formal1">
+            <div class="tone-dot"></div>
+            <div class="tone-label">Formal I</div>
+          </div>
+          <div class="tone-item" data-tone="formal2">
+            <div class="tone-dot"></div>
+            <div class="tone-label">Formal II</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="label">要求</div>
+    <div class="label">Instructions (Editable)</div>
     <textarea id="tone-prompt" class="box-small" placeholder=""></textarea>
+    <div class="input-actions">
+      <a class="x-vibe-btn" id="btn-x-vibe" href="javascript:void(0)"></a>
+      <button class="btn-secondary" id="btn-reset">Reset</button>
+    </div>
 
-    <div class="label">输入要翻译的内容</div>
+    <div class="label">Enter text to translate</div>
     <textarea id="translate-input" class="box-large" placeholder=""></textarea>
+    <div class="input-actions">
+      <button class="btn-secondary" id="btn-clear">Clear</button>
+    </div>
 
-    <button class="btn" id="btn-translate">翻译</button>
+    <button class="btn" id="btn-translate">Translate</button>
   </div>
 
   <div id="sec-grammar" class="section">
-    <div class="label">要求（可选）</div>
+    <div class="label">Additional Focus (Optional)</div>
     <textarea id="grammar-prompt" class="box-small" placeholder=""></textarea>
+    <div class="input-actions">
+      <button class="btn-secondary" id="btn-grammar-reset">Reset</button>
+    </div>
 
-    <div class="label">输入要检查的英文</div>
+    <div class="label">Enter text to check</div>
     <textarea id="grammar-input" class="box-large" placeholder=""></textarea>
+    <div class="input-actions">
+      <button class="btn-secondary" id="btn-grammar-clear">Clear</button>
+    </div>
 
-    <button class="btn" id="btn-check">开始检查</button>
+    <button class="btn" id="btn-check">Check</button>
   </div>
 
-  <div id="loading" class="loading">Kimi 处理中...预计至多需要30秒 流式输出，没看到完整内容就是还没处理完</div>
+  <div id="loading" class="loading">
+    <div class="spinner-wrap" id="loading-spinner">
+      <img src="thinking.svg" alt="Loading..." id="loading-img">
+    </div>
+    <div class="loading-text" id="loading-text"></div>
+  </div>
 
   <div id="result-box" class="result-box">
     <div class="result-header">
-      <span class="result-title">结果</span>
-      <button class="copy-btn" id="btn-copy">复制</button>
+      <span class="result-title">Result</span>
+      <button class="copy-btn" id="btn-copy">Copy</button>
     </div>
     <div id="result-body" class="result-body"></div>
   </div>
 
+  <div class="footer-section">
+    <div class="accordion-item">
+      <div class="accordion-header" id="usage-header">
+        <span class="sublabel" id="footer-usage-label">How to Use</span>
+        <span class="accordion-toggle">Expand</span>
+      </div>
+      <div class="accordion-content" id="footer-usage-text"></div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" id="troubleshoot-header">
+        <span class="sublabel" id="footer-troubleshoot-label">Troubleshoot</span>
+        <span class="accordion-toggle">Expand</span>
+      </div>
+      <div class="accordion-content" id="footer-troubleshoot-text"></div>
+    </div>
+    <div class="accordion-item">
+      <div class="accordion-header" id="credits-header">
+        <span class="sublabel" id="footer-credits-label">Credits</span>
+        <span class="accordion-toggle">Expand</span>
+      </div>
+      <div class="accordion-content footer-text" id="footer-credits-text"></div>
+    </div>
+  </div>
+
+<script src="i18n.js"></script>
 <script>
 (function() {
-  var defaultPrompts = {
-    casual: "Use a casual, relaxed, and conversational tone. Sound like you are talking to a friend. Use everyday language and contractions where natural. Keep it informal but clear.",
-    natural: "Use a natural, balanced tone that sounds like it was written by an educated native speaker. Not too stiff, not too casual. Just clear, idiomatic, and authentic.",
-    formal: "Use a formal, professional tone. Suitable for business emails, academic papers, or official documents. Avoid contractions, slang, and colloquialisms. Be precise and polished."
-  };
-  var defaultGrammarPrompt = "Make the minimum necessary changes.";
+  var I18n = window.TranslatorI18n;
+  var $ = I18n.$;
 
-  var currentLang = 'zh';
-  var currentMode = 'translate';
-  var currentTone = 'natural';
-  var prompts = { casual: defaultPrompts.casual, natural: defaultPrompts.natural, formal: defaultPrompts.formal };
-  var grammarPrompt = defaultGrammarPrompt;
+  $("btn-zh").addEventListener("click", function() { I18n.setLang("zh"); });
+  $("btn-en").addEventListener("click", function() { I18n.setLang("en"); });
+  $("tab-translate").addEventListener("click", function() { I18n.setMode("translate"); });
+  $("tab-grammar").addEventListener("click", function() { I18n.setMode("grammar"); });
+  $("btn-translate").addEventListener("click", I18n.sendTranslate);
+  $("btn-check").addEventListener("click", I18n.sendGrammar);
+  $("btn-copy").addEventListener("click", I18n.copyResult);
+  $("btn-theme").addEventListener("click", I18n.toggleTheme);
 
-  var i18n = {
-    zh: {
-      translate: '翻译',
-      grammar: '语法纠错',
-      tone: '语气',
-      casual: 'Casual',
-      natural: 'Natural',
-      formal: 'Formal',
-      customPromptLabel: '要求',
-      textToTranslate: '输入要翻译的内容',
-      translateBtn: '翻译',
-      grammarPromptLabel: '要求（可选）',
-      textToCheck: '输入要检查的英文',
-      checkBtn: '开始检查',
-      result: '结果',
-      copy: '复制',
-      copied: '已复制',
-      loading: 'Kimi 处理中...预计至多需要30秒。采用流式输出，没看到完整内容就是还没处理完',
-      errorEmpty: '请输入内容',
-      phPrompt: '可在此编辑对翻译风格的额外要求...',
-      phText: '在此输入原文...',
-      phGrammarPrompt: '例如：重点关注学术用词、邮件 礼仪...',
-      phGrammarText: '在此输入英文文本...',
-      footerUsage: '使用说明',
-      footerCredits: '鸣谢',
-      footerUsageText: '<strong>翻译模式：</strong>输入任意语言文本，选择语气（Casual/Natural/Formal），可在"要求"框中编辑目标语言和风格指令，点击翻译获取目标语言翻译。<br><strong>语法纠错：</strong>输入英文或中文文本，在"要求（可选）"框中可指定重点检查方向，点击开始检查 获取修改建议和问题分析。<br><strong>提示：</strong>Ctrl+Enter 可快捷提交。 点击☀️/🌙切换夜间模式。',
-      footerCreditsText: 'Powered by <a href="https://www.moonshot.cn" target="_blank">Moonshot AI (Kimi K2.5)</a> · Interface design by user request · System prompt written by ChatGPT (GPT-5.5-Instant)'
-    },
-    en: {
-      translate: 'Translate',
-      grammar: 'Grammar Check',
-      tone: 'Tone',
-      casual: 'Casual',
-      natural: 'Natural',
-      formal: 'Formal',
-      customPromptLabel: 'Additional Instructions (Editable)',
-      textToTranslate: 'Enter text to translate',
-      translateBtn: 'Translate',
-      grammarPromptLabel: 'Additional Focus (Optional)',
-      textToCheck: 'Enter Chinese text to check',
-      checkBtn: 'Check',
-      result: 'Result',
-      copy: 'Copy',
-      copied: 'Copied',
-      loading: 'Kimi is thinking...It may take 30 seconds tops. Streaming output. If you do not see the complete content yet, that means it is still processing',
-      errorEmpty: 'Please enter some text',
-      phPrompt: 'Edit additional style instructions here...',
-      phText: 'Enter source text here...',
-      phGrammarPrompt: 'e.g. Focus on academic tone...',
-      phGrammarText: 'Enter Chinese text here...',
-      footerUsage: 'How to Use',
-      footerCredits: 'Credits',
-      footerUsageText: '<strong>Translate:</strong>Enter text in any language, select a tone (Casual/Natural/Formal), and edit the target language and style instructions in the "Requirements" box. Then click Translate to receive your translation.<br><strong>Grammar Check:</strong> Enter English or Chinese text, specify focus areas in the "Requirements (Optional)" box, and click Check for corrections and analysis.<br><strong>Tip:</strong> Press Ctrl+Enter to submit quickly. Click ☀️/🌙 to toggle dark mode.',
-      footerCreditsText: 'Powered by <a href="https://www.moonshot.cn" target="_blank">Moonshot AI (Kimi K2.5)</a> · Interface design by user request · System prompt written by ChatGPT (GPT-5.5-Instant)'
+  document.querySelectorAll(".tone-item").forEach(function(el) {
+    el.addEventListener("click", function() { I18n.setTone(this.getAttribute("data-tone")); });
+  });
+
+  $("btn-x-vibe").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleXvibe();
+  });
+
+  $("btn-clear").addEventListener("click", function() { $("translate-input").value = ""; });
+  $("btn-reset").addEventListener("click", function() {
+    I18n.resetXvibe();
+    var tone = I18n.currentTone();
+    var defaults = I18n.defaultPrompts;
+    $("tone-prompt").value = defaults[tone] || "";
+  });
+  $("btn-grammar-clear").addEventListener("click", function() { $("grammar-input").value = ""; });
+  $("btn-grammar-reset").addEventListener("click", function() {
+    $("grammar-prompt").value = I18n.defaultGrammarPrompt;
+  });
+
+  document.querySelectorAll('.accordion-header').forEach(function(header) {
+    header.addEventListener('click', function(e) {
+      var content = this.nextElementSibling;
+      var toggle = this.querySelector('.accordion-toggle');
+      if (!content || !toggle) return;
+      var isOpen = content.classList.toggle('show');
+      toggle.classList.toggle('open', isOpen);
+      var t = I18n.i18n[I18n.currentLang()];
+      toggle.textContent = isOpen ? t.collapse : t.expand;
+    });
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+      if (I18n.currentMode() === 'translate') {
+        I18n.sendTranslate();
+      } else {
+        I18n.sendGrammar();
+      }
     }
-  };
+  });
 
-  function $(id) { return document.getElementById(id); }
-
-  function setLang(lang) {
-    currentLang = lang;
-    var t = i18n[lang];
-    $("tab-translate").textContent = t.translate;
-    $("tab-grammar").textContent = t.grammar;
-    $("btn-translate").textContent = t.translateBtn;
-    $("btn-check").textContent = t.checkBtn;
-    $("btn-copy").textContent = t.copy;
-    $("loading").textContent = t.loading;
-    document.querySelector(".tone-wrap .sublabel").textContent = t.tone;
-    var opts = document.querySelectorAll(".tone-option");
-    opts[0].textContent = t.casual;
-    opts[1].textContent = t.natural;
-    opts[2].textContent = t.formal;
-    var transLabels = $("sec-translate").querySelectorAll(".label");
-    transLabels[0].textContent = t.customPromptLabel;
-    transLabels[1].textContent = t.textToTranslate;
-    var gramLabels = $("sec-grammar").querySelectorAll(".label");
-    gramLabels[0].textContent = t.grammarPromptLabel;
-    gramLabels[1].textContent = t.textToCheck;
-    $("result-box").querySelector(".result-title").textContent = t.result;
-    $("btn-zh").classList.toggle("active", lang === "zh");
-    $("btn-en").classList.toggle("active", lang === "en");
-    $("tone-prompt").placeholder = t.phPrompt;
-    $("translate-input").placeholder = t.phText;
-    $("grammar-prompt").placeholder = t.phGrammarPrompt;
-    $("grammar-input").placeholder = t.phGrammarText;
-    $("footer-usage-label").textContent = t.footerUsage;
-    $("footer-credits-label").textContent = t.footerCredits;
-    $("footer-usage-text").innerHTML = t.footerUsageText;
-    $("footer-credits-text").innerHTML = t.footerCreditsText;
-  }
-
-  function setMode(mode) {
-    currentMode = mode;
-    $("sec-translate").classList.toggle("active", mode === "translate");
-    $("sec-grammar").classList.toggle("active", mode === "grammar");
-    $("tab-translate").classList.toggle("active", mode === "translate");
-    $("tab-grammar").classList.toggle("active", mode === "grammar");
-    hideResult();
-    setLang(currentLang);
-  }
-
-  function setTone(tone) {
-    prompts[currentTone] = $("tone-prompt").value;
-    currentTone = tone;
-    $("tone-prompt").value = prompts[tone];
-    document.querySelectorAll(".tone-option").forEach(function(el) {
-      el.classList.toggle("active", el.getAttribute("data-tone") === tone);
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', function(e) {
+      var saved = localStorage.getItem("theme");
+      if (!saved || saved === 'auto') {
+        if (e.matches) {
+          document.documentElement.setAttribute("data-theme", "dark");
+          $("btn-theme").innerHTML = "&#9790;";
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+          $("btn-theme").innerHTML = "&#9788;";
+        }
+      }
     });
   }
 
-  function setLoading(show) {
-    $("loading").classList.toggle("show", show);
+  var slider = document.querySelector(".tone-slider");
+  var track = document.querySelector(".tone-track");
+  var isDragging = false;
+
+  function updateToneFromX(clientX) {
+    var rect = track.getBoundingClientRect();
+    var x = clientX - rect.left;
+    var width = rect.width;
+    var ratio = Math.max(0, Math.min(1, x / width));
+    var index = Math.round(ratio * 4);
+    var tones = ["casual2", "casual1", "natural", "formal1", "formal2"];
+    I18n.setTone(tones[index]);
   }
 
-  function hideResult() {
-    $("result-box").classList.remove("show");
-  }
-
-  function showResult(text) {
-    var body = $("result-body");
-    var html = text
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/^- (.+)$/gm, "<li>$1</li>")
-      .replace(/(<li>.+<\/li>\n?)+/g, "<ul>$&</ul>")
-      .replace(/<<\/ul>\s*<<ul>/g, "");
-    body.innerHTML = html;
-    $("result-box").classList.add("show");
-  }
-
-  function copyResult() {
-    var text = $("result-body").innerText;
-    var btn = $("btn-copy");
-    var orig = btn.textContent;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(function() {
-        btn.textContent = i18n[currentLang].copied;
-        setTimeout(function() { btn.textContent = orig; }, 1500);
-      });
-    } else {
-      var ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      btn.textContent = i18n[currentLang].copied;
-      setTimeout(function() { btn.textContent = orig; }, 1500);
-    }
-  }
-
-  async function sendRequest(mode, text, customPrompt) {
-    setLoading(true);
-    hideResult();
-
-    try {
-      var res = await fetch("/api/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: mode, text: text, customPrompt: customPrompt })
-      });
-
-      if (!res.ok) {
-        var errData = await res.json().catch(function() { return {}; });
-        throw new Error(errData.detail || errData.error || ("HTTP " + res.status));
-      }
-
-      var reader = res.body.getReader();
-      var decoder = new TextDecoder();
-      var buffer = "";
-      var fullText = "";
-
-      var resultBox = $("result-box");
-      var resultBody = $("result-body");
-      resultBody.textContent = "";
-      resultBox.classList.add("show");
-
-      while (true) {
-        var chunk = await reader.read();
-        if (chunk.done) break;
-
-        buffer += decoder.decode(chunk.value, { stream: true });
-        var lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (var i = 0; i < lines.length; i++) {
-          var line = lines[i].trim();
-          if (!line || line.indexOf("data: ") !== 0) continue;
-          var data = line.slice(6).trim();
-          if (data === "[DONE]") continue;
-          try {
-            var json = JSON.parse(data);
-            if (json.error) throw new Error(json.error.message || "API Error");
-            var content = (json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content) || "";
-            if (content) {
-              fullText += content;
-              resultBody.textContent = fullText;
-            }
-          } catch (e) {
-            if (e.message && e.message.indexOf("API") >= 0) throw e;
-          }
-        }
-      }
-
-      if (fullText) {
-        showResult(fullText);
-      } else {
-        hideResult();
-      }
-
-    } catch (e) {
-      alert("Error: " + e.message);
-      hideResult();
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function sendTranslate() {
-    var text = $("translate-input").value.trim();
-    if (!text) { alert(i18n[currentLang].errorEmpty); return; }
-    prompts[currentTone] = $("tone-prompt").value;
-    var customPrompt = $("tone-prompt").value.trim();
-    sendRequest("translate_en", text, customPrompt);
-  }
-
-  function sendGrammar() {
-    var text = $("grammar-input").value.trim();
-    if (!text) { alert(i18n[currentLang].errorEmpty); return; }
-    grammarPrompt = $("grammar-prompt").value;
-    var customPrompt = $("grammar-prompt").value.trim();
-    sendRequest("grammar", text, customPrompt);
-  }
-
-  function toggleTheme() {
-    var html = document.documentElement;
-    var current = html.getAttribute("data-theme");
-    var next = current === "dark" ? null : "dark";
-    if (next) {
-      html.setAttribute("data-theme", "dark");
-      localStorage.setItem("theme", "dark");
-      $("btn-theme").innerHTML = "&#9790;";
-    } else {
-      html.removeAttribute("data-theme");
-      localStorage.setItem("theme", "light");
-      $("btn-theme").innerHTML = "&#9788;";
-    }
-  }
-
-  $("btn-zh").onclick = function() { setLang("zh"); };
-  $("btn-en").onclick = function() { setLang("en"); };
-  $("tab-translate").onclick = function() { setMode("translate"); };
-  $("tab-grammar").onclick = function() { setMode("grammar"); };
-  $("btn-translate").onclick = sendTranslate;
-  $("btn-check").onclick = sendGrammar;
-  $("btn-copy").onclick = copyResult;
-  $("btn-theme").onclick = toggleTheme;
-
-  document.querySelectorAll(".tone-option").forEach(function(el) {
-    el.onclick = function() { setTone(this.getAttribute("data-tone")); };
+  slider.addEventListener("pointerdown", function(e) {
+    isDragging = true;
+    slider.setPointerCapture(e.pointerId);
+    slider.style.cursor = "grabbing";
+    updateToneFromX(e.clientX);
   });
 
-  $("tone-prompt").value = prompts.natural;
-  $("grammar-prompt").value = grammarPrompt;
+  slider.addEventListener("pointermove", function(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    updateToneFromX(e.clientX);
+  });
 
-  var savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    document.documentElement.setAttribute("data-theme", "dark");
-    $("btn-theme").innerHTML = "&#9790;";
-  }
+  slider.addEventListener("pointerup", function(e) {
+    isDragging = false;
+    slider.style.cursor = "";
+  });
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", function() { setLang("zh"); });
-  } else {
-    setLang("zh");
-  }
+  slider.addEventListener("pointercancel", function(e) {
+    isDragging = false;
+    slider.style.cursor = "";
+  });
 })();
 </script>
-
-  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);">
-    <div class="sublabel" id="footer-usage-label">使 用说明</div>
-    <div class="footer-text" id="footer-usage-text" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
-      <strong>翻译模式：</strong>输入任意语言文本，选择语气（Casual/Natural/Formal），可在"要求"框中编辑目标语言和风格指令，点击翻译获取目标语言翻译。<br>
-      <strong>语法纠错：</strong>输入英文或中文文本，在"要求（可选）"框中可指定重点检查方向，点击开始检查 获取修改建议和问题分析。<br>
-      <strong>提示：</strong>Ctrl+Enter 可快捷提交。 点击☀️/🌙切换夜间模式。
-    </div>
-    <div class="sublabel" id="footer-credits-label"> 鸣谢</div>
-    <div class="footer-text" id="footer-credits-text" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-      Powered by <a href="https://www.moonshot.cn" target="_blank" style="color: var(--text-secondary);">Moonshot AI (Kimi K2.5)</a> · Interface design by user request · System prompt written by ChatGPT (GPT-5.5-Instant)
-    </div>
-  </div>
 
 </body>
 </html>

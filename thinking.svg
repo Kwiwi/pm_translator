@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <rect x="50" y="85" width="300" height="30" fill="white" stroke="black" stroke-width="2"/>
+  <rect width="30" height="26" fill="black" y="87">
+    <animate attributeName="x"      
+      values="52;318;318;52"      
+      keyTimes="0;0.46875;0.5;1"      
+      keySplines="0.45 0 0.55 1;0 0 1 1;0.45 0 0.55 1"      
+      calcMode="spline"      
+      dur="1.28s"      
+      repeatCount="indefinite"/>
+  </rect>
+  <text x="200" y="145" font-family="Courier, 'Courier New', monospace" font-size="22" font-weight="bold" 
+        fill="white" stroke="black" stroke-width="1.2" text-anchor="middle">loading</text>
+</svg>

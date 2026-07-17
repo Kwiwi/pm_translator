@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <style>
+      .pulse {
+        transform-origin: center;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+      .ring-outer {
+        transform-origin: center;
+        animation: spin-cw 2.5s linear infinite;
+      }
+      @keyframes spin-cw {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .ring-inner {
+        transform-origin: center;
+        animation: spin-ccw 3s linear infinite;
+      }
+      @keyframes spin-ccw {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+      }
+      .rocket-breathe {
+        animation: breathe 2s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        0%, 100% { opacity: 0.85; }
+        50% { opacity: 1; }
+      }
+    </style>
+  </defs>
+  
+  <g class="pulse">
+    <!-- 外环：黑色填充，白色描边 -->
+    <circle 
+      class="ring-outer" 
+      cx="100" cy="100" r="70" 
+      fill="none" 
+      stroke="#FFFFFF" 
+      stroke-width="4" 
+      stroke-dasharray="100 60" 
+      stroke-linecap="round"
+    />
+    <circle 
+      class="ring-outer" 
+      cx="100" cy="100" r="70" 
+      fill="none" 
+      stroke="#000000" 
+      stroke-width="2" 
+      stroke-dasharray="100 60" 
+      stroke-linecap="round"
+    />
+    
+    <!-- 内环：白色填充，黑色描边 -->
+    <circle 
+      class="ring-inner" 
+      cx="100" cy="100" r="55" 
+      fill="none" 
+      stroke="#000000" 
+      stroke-width="4" 
+      stroke-dasharray="80 50" 
+      stroke-linecap="round"
+    />
+    <circle 
+      class="ring-inner" 
+      cx="100" cy="100" r="55" 
+      fill="none" 
+      stroke="#FFFFFF" 
+      stroke-width="2" 
+      stroke-dasharray="80 50" 
+      stroke-linecap="round"
+    />
+    
+    <!-- 火箭：黑色填充，白色描边 -->
+    <g class="rocket-breathe" transform="translate(100, 100)">
+      <path 
+        d="M 0 -18 
+           C 6 -12, 8 -4, 8 6 
+           L 8 14 
+           L 4 12 
+           L 0 16 
+           L -4 12 
+           L -8 14 
+           L -8 6 
+           C -8 -4, -6 -12, 0 -18 Z" 
+        fill="#000000" 
+        stroke="#FFFFFF" 
+        stroke-width="1.5" 
+        stroke-linejoin="round"
+      />
+      <circle cx="0" cy="-4" r="3" fill="#000000" stroke="#FFFFFF" stroke-width="1"/>
+      <path 
+        d="M -3 14 L 0 22 L 3 14 Z" 
+        fill="#000000" 
+        stroke="#FFFFFF" 
+        stroke-width="1" 
+        stroke-linejoin="round"
+      />
+    </g>
+  </g>
+</svg>
