@@ -22,43 +22,74 @@
   </div>
 
   <div id="sec-translate" class="section active">
-    <div class="tone-wrap">
-      <div class="sublabel">Tone</div>
-      <div class="tone-slider">
-        <div class="tone-track"></div>
-        <div class="tone-dots">
-          <div class="tone-item" data-tone="casual2">
-            <div class="tone-dot"></div>
-            <div class="tone-label">Casual II</div>
-          </div>
-          <div class="tone-item label-below" data-tone="casual1">
-            <div class="tone-dot"></div>
-            <div class="tone-label">Casual I</div>
-          </div>
-          <div class="tone-item active" data-tone="natural">
-            <div class="tone-dot"></div>
-            <div class="tone-label">Natural</div>
-          </div>
-          <div class="tone-item label-below" data-tone="formal1">
-            <div class="tone-dot"></div>
-            <div class="tone-label">Formal I</div>
-          </div>
-          <div class="tone-item" data-tone="formal2">
-            <div class="tone-dot"></div>
-            <div class="tone-label">Formal II</div>
+    <!-- Target Language -->
+    <div class="label" id="label-target-lang">Target language</div>
+    <input list="lang-options" id="target-lang" class="input-text" placeholder="e.g. English, Japanese, French">
+    <datalist id="lang-options">
+      <option value="Chinese">
+      <option value="English">
+      <option value="Japanese">
+      <option value="French">
+      <option value="German">
+      <option value="Spanish">
+      <option value="Korean">
+    </datalist>
+
+    <!-- Tone (collapsed by default) -->
+    <div class="tone-collapsed" id="tone-collapsed">
+      <span class="sublabel" id="label-tone">Tone</span>
+      <a class="tone-toggle-link" id="tone-toggle-link" href="javascript:void(0)">Natural</a>
+    </div>
+    <div class="tone-expanded" id="tone-expanded" style="display: none;">
+      <div class="tone-wrap">
+        <div class="tone-slider">
+          <div class="tone-track"></div>
+          <div class="tone-dots">
+            <div class="tone-item" data-tone="casual2">
+              <div class="tone-dot"></div>
+              <div class="tone-label">Casual II</div>
+            </div>
+            <div class="tone-item label-below" data-tone="casual1">
+              <div class="tone-dot"></div>
+              <div class="tone-label">Casual I</div>
+            </div>
+            <div class="tone-item active" data-tone="natural">
+              <div class="tone-dot"></div>
+              <div class="tone-label">Natural</div>
+            </div>
+            <div class="tone-item label-below" data-tone="formal1">
+              <div class="tone-dot"></div>
+              <div class="tone-label">Formal I</div>
+            </div>
+            <div class="tone-item" data-tone="formal2">
+              <div class="tone-dot"></div>
+              <div class="tone-label">Formal II</div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="label" id="label-tone-instructions">Instructions (Editable)</div>
+      <textarea id="tone-prompt" class="box-small" placeholder=""></textarea>
+      <div class="input-actions">
+        <a class="x-vibe-btn" id="btn-x-vibe" href="javascript:void(0)"></a>
+        <button class="btn-secondary" id="btn-reset">Reset</button>
+      </div>
+      <a class="tone-collapse-link" id="tone-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
-    <div class="label">Instructions (Editable)</div>
-    <textarea id="tone-prompt" class="box-small" placeholder=""></textarea>
-    <div class="input-actions">
-      <a class="x-vibe-btn" id="btn-x-vibe" href="javascript:void(0)"></a>
-      <button class="btn-secondary" id="btn-reset">Reset</button>
+    <!-- Context / Usage Scenario (collapsed by default) -->
+    <div class="context-collapsed" id="context-collapsed">
+      <span class="sublabel" id="label-context-prefix">Usage scenario</span>
+      <a class="context-toggle-link" id="context-toggle-link" href="javascript:void(0)">Add context</a>
+    </div>
+    <div class="context-expanded" id="context-expanded" style="display: none;">
+      <div class="label" id="label-context">Usage scenario</div>
+      <textarea id="context-input" class="box-small" placeholder=""></textarea>
+      <a class="context-collapse-link" id="context-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
-    <div class="label">Enter text to translate</div>
+    <!-- Source Text -->
+    <div class="label" id="label-source">Enter text to translate</div>
     <textarea id="translate-input" class="box-large" placeholder=""></textarea>
     <div class="input-actions">
       <button class="btn-secondary" id="btn-clear">Clear</button>
@@ -68,13 +99,13 @@
   </div>
 
   <div id="sec-grammar" class="section">
-    <div class="label">Additional Focus (Optional)</div>
+    <div class="label" id="label-grammar-prompt">Additional Focus (Optional)</div>
     <textarea id="grammar-prompt" class="box-small" placeholder=""></textarea>
     <div class="input-actions">
       <button class="btn-secondary" id="btn-grammar-reset">Reset</button>
     </div>
 
-    <div class="label">Enter text to check</div>
+    <div class="label" id="label-grammar-text">Enter text to check</div>
     <textarea id="grammar-input" class="box-large" placeholder=""></textarea>
     <div class="input-actions">
       <button class="btn-secondary" id="btn-grammar-clear">Clear</button>
@@ -120,6 +151,7 @@
       </div>
       <div class="accordion-content footer-text" id="footer-credits-text"></div>
     </div>
+    <div id="grok-credit" style="display: none; margin-top: 8px; padding: 0 8px; font-size: 13px; color: var(--text-secondary);"></div>
   </div>
 
 <script src="i18n.js"></script>
@@ -137,8 +169,66 @@
   $("btn-copy").addEventListener("click", I18n.copyResult);
   $("btn-theme").addEventListener("click", I18n.toggleTheme);
 
+  // Tone expand/collapse
+  $("tone-toggle-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleToneExpand();
+  });
+  $("tone-collapse-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleToneExpand();
+  });
+
+  // Context expand/collapse
+  $("context-toggle-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleContextExpand();
+  });
+  $("context-collapse-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleContextExpand();
+  });
+
+  // Tone slider
   document.querySelectorAll(".tone-item").forEach(function(el) {
     el.addEventListener("click", function() { I18n.setTone(this.getAttribute("data-tone")); });
+  });
+
+  var slider = document.querySelector(".tone-slider");
+  var track = document.querySelector(".tone-track");
+  var isDragging = false;
+
+  function updateToneFromX(clientX) {
+    var rect = track.getBoundingClientRect();
+    var x = clientX - rect.left;
+    var width = rect.width;
+    var ratio = Math.max(0, Math.min(1, x / width));
+    var index = Math.round(ratio * 4);
+    var tones = ["casual2", "casual1", "natural", "formal1", "formal2"];
+    I18n.setTone(tones[index]);
+  }
+
+  slider.addEventListener("pointerdown", function(e) {
+    isDragging = true;
+    slider.setPointerCapture(e.pointerId);
+    slider.style.cursor = "grabbing";
+    updateToneFromX(e.clientX);
+  });
+
+  slider.addEventListener("pointermove", function(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    updateToneFromX(e.clientX);
+  });
+
+  slider.addEventListener("pointerup", function(e) {
+    isDragging = false;
+    slider.style.cursor = "";
+  });
+
+  slider.addEventListener("pointercancel", function(e) {
+    isDragging = false;
+    slider.style.cursor = "";
   });
 
   $("btn-x-vibe").addEventListener("click", function(e) {
@@ -195,45 +285,9 @@
       }
     });
   }
-
-  var slider = document.querySelector(".tone-slider");
-  var track = document.querySelector(".tone-track");
-  var isDragging = false;
-
-  function updateToneFromX(clientX) {
-    var rect = track.getBoundingClientRect();
-    var x = clientX - rect.left;
-    var width = rect.width;
-    var ratio = Math.max(0, Math.min(1, x / width));
-    var index = Math.round(ratio * 4);
-    var tones = ["casual2", "casual1", "natural", "formal1", "formal2"];
-    I18n.setTone(tones[index]);
-  }
-
-  slider.addEventListener("pointerdown", function(e) {
-    isDragging = true;
-    slider.setPointerCapture(e.pointerId);
-    slider.style.cursor = "grabbing";
-    updateToneFromX(e.clientX);
-  });
-
-  slider.addEventListener("pointermove", function(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-    updateToneFromX(e.clientX);
-  });
-
-  slider.addEventListener("pointerup", function(e) {
-    isDragging = false;
-    slider.style.cursor = "";
-  });
-
-  slider.addEventListener("pointercancel", function(e) {
-    isDragging = false;
-    slider.style.cursor = "";
-  });
 })();
 </script>
 
 </body>
 </html>
+

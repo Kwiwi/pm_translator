@@ -1,12 +1,26 @@
+# "Kimi Translator"is now"PM Translator"!
+
+(copyright issues...)
+
+*this page was polished by Kimi
+
 <details>
 <summary>中文版</summary>
 
-两个功能：多语翻译 和 语法纠错，详见下文。
-Moonshot API + Grok API + Cloudflare Pages 实现。
-我认为最重要的是可以直接写提示词要求怎么翻译/着重检查什么语法。
+一个简洁的在线翻译与语法纠错工具，基于 Moonshot API + xAI Grok API + Cloudflare Pages 实现。
+
+核心思路是：你可以直接写提示词，要求模型怎么翻译，或者着重检查哪些语法问题。
+
 ~~虽然说和自己打开 Kimi/Grok app 问没多大区别~~
 
 ---
+
+```
+07/24/2026 更新：v2.2 
+1. 新增Target language专属输入框，Tone 和 Usage scenario 分家，且默认在界面上折叠
+2. 优化了提示词，有其针对 v2.1 中 Grok 偶尔抽风的毛病。
+3. 更新了脚注。
+```
 
 `07/17/2026 更新：V2.1 — 接入 Grok API，Casual II 档位支持一键切换 "X vibe" 模式`
 
@@ -18,49 +32,62 @@ Moonshot API + Grok API + Cloudflare Pages 实现。
 
 ### 功能
 
-- **翻译**：默认中译英，翻译成其他语言需要自己在自定义要求那里指定。预设有五种语气：随意 I / 随意 II / 自然 / 正式 I / 正式 II
-- **语法纠错**：修正语法和拼写，同时保留原有语气与风格。也可以指定要求。
-- **"X vibe" 模式**：在 Casual II 档位下，点 "想要X味翻译？看这里！" 会得到Grok翻译，语气更野。
+- **多语翻译**：支持任意语言互译。目标语言会根据界面语言预填：中文界面默认译为英文，英文界面默认译为中文；也可以自行改为日语、法语等其他语言。
+- **语法纠错**：修正语法和拼写，同时尽量保留原有语气与风格。可以在“额外要求”中指定检查重点。
+- **语气档位**：预设有五种语气（随意 I / 随意 II / 自然 / 正式 I / 正式 II），每个档位的提示词都可以直接编辑。
+- **使用场景**：补充上下文（如“发给导师的邮件”“安慰朋友的消息”），让翻译更贴合情境。
+- **"X vibe" 模式**：在 Casual II 档位下，点击“想要 X 味翻译？看这里！”会调用 Grok 模型，输出更地道、更有网络感的 casual 翻译。
 
-还有双语界面、夜间模式、响应式界面、流式输出、Ctrl+Enter 快捷提交什么的
+另外还支持双语界面、夜间模式、响应式布局、流式输出、Ctrl+Enter 快捷提交等。
 
 </details>
 
 ---
 
-Two main features: multilingual translation and grammar correction. Check the details below.
+Two main features: multilingual translation and grammar correction.
 
-Built using Moonshot API, Grok API, and Cloudflare Pages.
+Built using Moonshot API, xAI Grok API, and Cloudflare Pages.
 
-I think the key thing is you can just write prompts to specify exactly how you want things translated or what grammar to focus on.
+The key idea is that you can write prompts to specify exactly how you want things translated or what grammar issues to focus on.
 
 ~~Though it's not that different from just opening the Kimi/Grok app and asking~~
 
 ---
 
-`Jul 17, 2026 Update: V2.1 — Added Grok API integration. Casual II tone now supports one-click "X vibe" mode.`
+```
+Jul 24th,2026 Update: v2.2
+1. Added Target language input and split Tone and Usage scenario into separate fields—both now collapse by default.
+2. Refined the prompts, specifically addressing Grok stability issues from v2.1.
+3. Updated footnotes.
+```
+
+`Jul 17, 2026 Update: V2.1 — Added xAI Grok API integration. Casual II tone now supports one-click "X vibe" mode.`
 
 `Jul 11, 2026 Update: V2 — UI refinements, tone presets expanded from 3 to 5 (Casual I/II, Natural, Formal I/II), added Troubleshoot accordion and loading animation.`
 
-`May 30, 2026 Update: Added streaming output and fixed the grammar checker—it was getting way too picky.`
+`May 30, 2026 Update: Added streaming output and fixed the grammar checker being overly strict.`
 
 ---
 
 ### Features
 
-- **Translation**: Defaults to Chinese-to-English, but you can specify other languages in the custom settings. Five preset tones: Casual I / Casual II / Natural / Formal I / Formal II.
-- **Grammar Check**: Fixes up grammar and spelling while keeping the original tone and style. You can also throw in specific requests.
-- **"X vibe" Mode**: On Casual II, click "want that X vibe?" to switch to the Grok for a rawer, more vibe-heavy casual translation.
+- **Translation**: Supports any-language translation. The target language is prefilled based on UI language: Chinese UI defaults to English, English UI defaults to Chinese. You can also change it to Japanese, French, etc.
+- **Grammar Check**: Fixes grammar and spelling while preserving the original tone and style. Optional focus areas can be specified.
+- **Tone Presets**: Five editable tones (Casual I / Casual II / Natural / Formal I / Formal II).
+- **Usage Scenario**: Add context (e.g. "email to supervisor", "comforting a friend") for more accurate translations.
+- **"X vibe" Mode**: On Casual II, click "want that X vibe?" to switch to Grok for a more authentic, internet-style casual translation.
 
-And there's bilingual interface, dark mode, responsive design, streaming output, Ctrl+Enter quick submit, etc.
+Also includes bilingual UI, dark mode, responsive design, streaming output, Ctrl+Enter quick submit, etc.
 
 ---
 
 ### Screenshots / 页面截图
 
-| ☀️ | 🌙 |
-|:-----------:|:-----------:|
-| ![☀️](screenshot_light.jpg) | ![🌙](screenshot_dark.jpg) |
+![footnote](footnote.jpg)
+![_expand](_expand.jpg)
+![_collapse](_collapse.jpg)
+![Chinese_exp](Chinese_exp.jpg)
+![grammar](grammar.jpg)
 
 ---
 
@@ -73,21 +100,18 @@ MIT 协议
 
 ### Credits / 鸣谢
 
-- Moonshot AI (Kimi K2.5) — Translation & grammar engine
-- Moonshot AI (Kimi K2.6( — Code assistance
-- xAI (Grok 4.20) — "X vibe" casual translation engine
+- [Moonshot AI](https://www.moonshot.cn) (Kimi K2.5) — Translation & grammar engine
+- [xAI](https://x.ai) (Grok) — "X vibe" casual translation engine
 - GPT-5.5 — System prompts & design philosophy
+- User — Design philosophy & UI design
 
 ---
 
 <details>
-<summary>deployment guide / 部署指南</summary>
-
-`Written by Kimi—I didn't feel like editing it`
-`A deployment guide by Kimi, written specifically for beginners`
+<summary>Deployment Guide / 部署指南</summary>
 
 `Kimi 写的——我懒得改了`
-`Kimi 写的部署指南，专门给新手看的`
+`A deployment guide by Kimi, written specifically for beginners`
 
 ## 技术栈 / Tech Stack
 
@@ -105,11 +129,11 @@ MIT 协议
 your-project/
 ├── _worker.js        # 后端 API 代理 / Backend API proxy
 ├── translator.html   # 前端界面 / Frontend interface
-├── i18n.js           # 翻译 / i18n
+├── i18n.js           # 国际化 / i18n
 ├── style.css         # 样式 / Styles
 ├── index.html        # 现有主页（可选）/ Your existing homepage (optional)
-├──loading2.svg       # Grok模式的等待动画 / Loading animation for Grok mode
-└──thinking.svg       # normal loading animation
+├── loading2.svg      # Grok 模式的等待动画 / Loading animation for Grok mode
+└── thinking.svg      # 普通等待动画 / Normal loading animation
 ```
 
 ### 2. 上传到 Cloudflare Pages / Upload to Cloudflare Pages

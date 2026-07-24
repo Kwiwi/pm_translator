@@ -1,5 +1,5 @@
 (function() {
-  var defaultPrompts = {
+  const defaultPrompts = {
     casual1: "Casual and friendly, slightly polished. Like talking to a familiar colleague.",
     casual2: "Very casual and relaxed. Like texting a close friend. Use slang and contractions naturally.",
     natural: "Natural native-speaker style. Clear, balanced, and authentic. Neither formal nor casual.",
@@ -7,52 +7,28 @@
     formal2: "Highly formal and precise. Suitable for academic, legal, or official writing."
   };
 
-  var grokPrompt = "Translate with maximum casual authenticity. Use natural slang, internet expressions, contractions, and cultural references as appropriate for the target language. Keep it raw, unfiltered, and vibe-heavy.";
+  const grokPrompt = "Translate with an authentic online tone. Use natural slang, casual expressions, and internet language when appropriate. Avoid forced slang, excessive profanity, or exaggerated meme language.";
 
-  var defaultGrammarPrompt = "Make the minimum necessary changes.";
+  const defaultGrammarPrompt = "Make the minimum necessary changes.";
 
-  var currentLang = 'en';
-  var currentMode = 'translate';
-  var currentTone = 'natural';
-  var isXvibe = false;
-  var prompts = {
+  let currentLang = 'en';
+  let currentMode = 'translate';
+  let currentTone = 'natural';
+  let isXvibe = false;
+  let isToneExpanded = false;
+  let isContextExpanded = false;
+  const prompts = {
     casual1: defaultPrompts.casual1,
     casual2: defaultPrompts.casual2,
     natural: defaultPrompts.natural,
     formal1: defaultPrompts.formal1,
     formal2: defaultPrompts.formal2
   };
-  var grammarPrompt = defaultGrammarPrompt;
-
-  window.TranslatorI18n = {
-    currentLang: function() { return currentLang; },
-    currentMode: function() { return currentMode; },
-    currentTone: function() { return currentTone; },
-    isXvibe: function() { return isXvibe; },
-    prompts: function() { return prompts; },
-    grammarPrompt: function() { return grammarPrompt; },
-    setLang: setLang,
-    setMode: setMode,
-    setTone: setTone,
-    toggleXvibe: toggleXvibe,
-    resetXvibe: resetXvibe,
-    setLoading: setLoading,
-    hideResult: hideResult,
-    showResult: showResult,
-    copyResult: copyResult,
-    sendRequest: sendRequest,
-    sendTranslate: sendTranslate,
-    sendGrammar: sendGrammar,
-    toggleTheme: toggleTheme,
-    defaultPrompts: defaultPrompts,
-    defaultGrammarPrompt: defaultGrammarPrompt,
-    i18n: i18n,
-    $: $
-  };
+  let grammarPrompt = defaultGrammarPrompt;
 
   function $(id) { return document.getElementById(id); }
 
-  var i18n = {
+  const i18n = {
     zh: {
       translate: '翻译',
       grammar: '语法纠错',
@@ -62,10 +38,16 @@
       natural: '自然',
       formal1: '正式 I',
       formal2: '正式 II',
-      customPromptLabel: '要求',
+      targetLangLabel: '目标语言',
+      targetLangPlaceholder: '例如：英语、日语、法语',
+      defaultTargetLang: 'English',
+      toneInstructionsLabel: '语气要求（可编辑）',
+      contextLabel: '使用场景',
+      contextPlaceholder: '例如：发给导师的邮件、安慰朋友的消息、学术论文...',
+      contextCollapsedLabel: '添加使用场景',
       textToTranslate: '输入要翻译的内容',
       translateBtn: '翻译',
-      grammarPromptLabel: '要求（可选）',
+      grammarPromptLabel: '额外要求（可选）',
       textToCheck: '输入要检查的文本',
       checkBtn: '开始检查',
       result: '结果',
@@ -75,16 +57,17 @@
       copied: '已复制',
       loading: '',
       errorEmpty: '请输入内容',
-      phPrompt: '可在此编辑对翻译风格的额外要求...',
+      phPrompt: '在此编辑对翻译风格的额外要求...',
       phText: '在此输入原文...',
       phGrammarPrompt: '例如：重点关注学术用词、邮件礼仪...',
       phGrammarText: '在此输入文本...',
       footerUsage: '使用说明',
       footerTroubleshoot: '常见问题',
-      footerUsageText: '<strong>翻译：</strong>输入任意语言文本，选择语气档位，可在"要求"框中编辑目标语言和风格指令，点击翻译。<br><strong>语法纠错：</strong>输入文本，在"要求（可选）"框中可指定检查方向，点击开始检查。<br><strong>快捷键：</strong>Ctrl+Enter 快捷提交。',
-      footerTroubleshootText: '<strong>输出不完整？</strong>这是流式输出，Kimi 仍在推理中，请稍等。<br><strong>响应慢？</strong>Kimi API 推理时间较长，属正常现象。<br><strong>翻译质量不佳？</strong>尝试在"要求"框中补充具体指令，如"翻译成日语"、"保留原文幽默感"。<br><strong>语法纠错无修改？</strong>说明原文已很通顺，或尝试在要求中指定检查重点。',
+      footerUsageText: '<strong>翻译：</strong>输入任意语言文本，选择目标语言。点击“语气”可切换五种风格（随意 I/II、自然、正式 I/II）；展开“使用场景”补充上下文，翻译更贴合情境。在“随意 II”下可点击 X-Vibe 使用 Grok 风格翻译。<br><strong>语法纠错：</strong>输入文本，在“额外要求”框中可指定检查方向（如学术用词、邮件礼仪），点击开始检查。<br><strong>快捷键：</strong>Ctrl+Enter 快捷提交。',
+      footerTroubleshootText: '<strong>输出不完整？</strong>这是流式输出，Kimi 仍在推理中，请稍等。<br><strong>响应慢？</strong>Kimi API 推理时间较长，属正常现象。<br><strong>翻译质量不佳？</strong>尝试在"使用场景"中补充上下文，或调整目标语言。<br><strong>语法纠错无修改？</strong>说明原文已很通顺，或尝试在要求中指定检查重点。',
       footerCredits: '鸣谢',
       footerCreditsText: '<a href="https://www.moonshot.cn" target="_blank">Moonshot AI (Kimi K2.5)</a> — 翻译与语法引擎<br><a href="https://chatgpt.com/" target="_blank">GPT-5.5</a> — 系统提示词与设计理念<br>用户 — 设计理念与 UI 设计',
+      grokCredit: '<a href="https://x.ai/" target="_blank">xAI (Grok)</a> — 翻译引擎',
       clear: '清空',
       reset: '重置',
       expand: '展开',
@@ -101,7 +84,13 @@
       natural: 'Natural',
       formal1: 'Formal I',
       formal2: 'Formal II',
-      customPromptLabel: 'Instructions (Editable)',
+      targetLangLabel: 'Target language',
+      targetLangPlaceholder: 'e.g. English, Japanese, French',
+      defaultTargetLang: 'Chinese',
+      toneInstructionsLabel: 'Instructions (Editable)',
+      contextLabel: 'Usage scenario',
+      contextPlaceholder: 'e.g. Email to supervisor, comforting a friend, academic paper...',
+      contextCollapsedLabel: 'Add context',
       textToTranslate: 'Enter text to translate',
       translateBtn: 'Translate',
       grammarPromptLabel: 'Additional Focus (Optional)',
@@ -120,10 +109,11 @@
       phGrammarText: 'Enter text here...',
       footerUsage: 'How to Use',
       footerTroubleshoot: 'Troubleshoot',
-      footerUsageText: '<strong>Translate:</strong> Enter text in any language, select a tone, and edit target language/style instructions in the box. Then click Translate.<br><strong>Grammar Check:</strong> Enter text, specify focus areas in the optional box, and click Check.<br><strong>Tip:</strong> Press Ctrl+Enter to submit.',
-      footerTroubleshootText: '<strong>Incomplete output?</strong> This is streaming output; Kimi is still reasoning. Please wait.<br><strong>Slow response?</strong> Kimi API inference takes time. This is normal.<br><strong>Poor translation quality?</strong> Try adding specific instructions, e.g. "Translate to Japanese", "Preserve humor".<br><strong>No grammar changes?</strong> The original text may already be correct, or try specifying a focus area.',
+      footerUsageText: '<strong>Translate:</strong> Enter text in any language and pick the target language. Expand Tone to choose from five styles (Casual I/II, Natural, Formal I/II). Add context in Usage scenario for more accurate results. On Casual II, click X-Vibe to switch to Grok-style translation.<br><strong>Grammar Check:</strong> Enter text and optionally specify focus areas (e.g. academic tone, email etiquette) in the Additional Focus box, then click Check.<br><strong>Tip:</strong> Press Ctrl+Enter to submit.',
+      footerTroubleshootText: '<strong>Incomplete output?</strong> This is streaming output; Kimi is still reasoning. Please wait.<br><strong>Slow response?</strong> Kimi API inference takes time. This is normal.<br><strong>Poor translation quality?</strong> Try adding context in "Usage scenario" or verify target language.<br><strong>No grammar changes?</strong> The original text may already be correct, or try specifying a focus area.',
       footerCredits: 'Credits',
       footerCreditsText: '<a href="https://www.moonshot.cn" target="_blank">Moonshot AI (Kimi K2.5)</a> — Translation & grammar engine<br><a href="https://chatgpt.com/" target="_blank">GPT-5.5</a> — System prompt & design philosophy<br>User — Design philosophy & UI design',
+      grokCredit: '<a href="https://x.ai/" target="_blank">xAI (Grok)</a> — Translation engine',
       clear: 'Clear',
       reset: 'Reset',
       expand: 'Expand',
@@ -133,10 +123,38 @@
     }
   };
 
+  window.TranslatorI18n = {
+    currentLang: function() { return currentLang; },
+    currentMode: function() { return currentMode; },
+    currentTone: function() { return currentTone; },
+    isXvibe: function() { return isXvibe; },
+    prompts: function() { return prompts; },
+    grammarPrompt: function() { return grammarPrompt; },
+    setLang: setLang,
+    setMode: setMode,
+    setTone: setTone,
+    toggleToneExpand: toggleToneExpand,
+    toggleContextExpand: toggleContextExpand,
+    toggleXvibe: toggleXvibe,
+    resetXvibe: resetXvibe,
+    setLoading: setLoading,
+    hideResult: hideResult,
+    showResult: showResult,
+    copyResult: copyResult,
+    sendRequest: sendRequest,
+    sendTranslate: sendTranslate,
+    sendGrammar: sendGrammar,
+    toggleTheme: toggleTheme,
+    defaultPrompts: defaultPrompts,
+    defaultGrammarPrompt: defaultGrammarPrompt,
+    i18n: i18n,
+    $: $
+  };
+
   function updateXvibeUI() {
-    var btn = $("btn-x-vibe");
+    const btn = $("btn-x-vibe");
     if (!btn) return;
-    var t = i18n[currentLang];
+    const t = i18n[currentLang];
     if (currentTone === 'casual2') {
       btn.style.display = '';
       if (isXvibe) {
@@ -151,6 +169,18 @@
     }
   }
 
+  function updateGrokCreditUI() {
+    const creditEl = $("grok-credit");
+    if (!creditEl) return;
+    const t = i18n[currentLang];
+    if (isXvibe && currentMode === 'translate') {
+      creditEl.innerHTML = t.grokCredit || '';
+      creditEl.style.display = '';
+    } else {
+      creditEl.style.display = 'none';
+    }
+  }
+
   function toggleXvibe() {
     if (currentTone !== 'casual2') return;
     isXvibe = !isXvibe;
@@ -160,16 +190,41 @@
       $("tone-prompt").value = prompts.casual2 || defaultPrompts.casual2;
     }
     updateXvibeUI();
+    updateGrokCreditUI();
   }
 
   function resetXvibe() {
     isXvibe = false;
     updateXvibeUI();
+    updateGrokCreditUI();
+  }
+
+  function toggleToneExpand() {
+    isToneExpanded = !isToneExpanded;
+    $("tone-collapsed").style.display = isToneExpanded ? 'none' : '';
+    $("tone-expanded").style.display = isToneExpanded ? '' : 'none';
+  }
+
+  function toggleContextExpand() {
+    isContextExpanded = !isContextExpanded;
+    $("context-collapsed").style.display = isContextExpanded ? 'none' : '';
+    $("context-expanded").style.display = isContextExpanded ? '' : 'none';
+  }
+
+  function updateContextCollapsedLabel() {
+    const link = $("context-toggle-link");
+    if (!link) return;
+    const t = i18n[currentLang];
+    const hasContent = $("context-input") && $("context-input").value.trim();
+    // If expanded, don't update (collapsed view is hidden)
+    if (isContextExpanded) return;
+    link.textContent = hasContent ? t.contextLabel : t.contextCollapsedLabel;
   }
 
   function setLang(lang) {
+    const prevLang = currentLang;
     currentLang = lang;
-    var t = i18n[lang];
+    const t = i18n[lang];
 
     $("tab-translate").textContent = t.translate;
     $("tab-grammar").textContent = t.grammar;
@@ -177,12 +232,27 @@
     $("btn-check").textContent = t.checkBtn;
     $("btn-copy").textContent = t.copy;
     $("loading-text").textContent = t.loading;
-    document.querySelector(".tone-wrap .sublabel").textContent = t.tone;
 
-    var items = document.querySelectorAll(".tone-item");
+    // Target language
+    $("label-target-lang").textContent = t.targetLangLabel;
+    $("target-lang").placeholder = t.targetLangPlaceholder;
+    // Update default if input is empty or still shows previous default
+    const targetLangInput = $("target-lang");
+    const prevDefault = i18n[prevLang].defaultTargetLang;
+    const currentValue = targetLangInput.value.trim();
+    if (!currentValue || currentValue === prevDefault) {
+      targetLangInput.value = t.defaultTargetLang || "";
+    }
+
+    // Tone
+    $("label-tone").textContent = t.tone;
+    $("tone-toggle-link").textContent = t[currentTone] || t.natural;
+    $("label-tone-instructions").textContent = t.toneInstructionsLabel;
+
+    const items = document.querySelectorAll(".tone-item");
     items.forEach(function(item) {
-      var tone = item.getAttribute("data-tone");
-      var label = item.querySelector(".tone-label");
+      const tone = item.getAttribute("data-tone");
+      const label = item.querySelector(".tone-label");
       if (tone === "casual1") label.textContent = t.casual1;
       else if (tone === "casual2") label.textContent = t.casual2;
       else if (tone === "natural") label.textContent = t.natural;
@@ -190,17 +260,23 @@
       else if (tone === "formal2") label.textContent = t.formal2;
     });
 
-    var transLabels = $("sec-translate").querySelectorAll(".label");
-    transLabels[0].textContent = t.customPromptLabel;
-    transLabels[1].textContent = t.textToTranslate;
-    var gramLabels = $("sec-grammar").querySelectorAll(".label");
-    gramLabels[0].textContent = t.grammarPromptLabel;
-    gramLabels[1].textContent = t.textToCheck;
+    // Context
+    $("label-context").textContent = t.contextLabel;
+    $("context-input").placeholder = t.contextPlaceholder;
+    updateContextCollapsedLabel();
+
+    // Source text
+    $("label-source").textContent = t.textToTranslate;
+
+    // Grammar labels
+    $("label-grammar-prompt").textContent = t.grammarPromptLabel;
+    $("label-grammar-text").textContent = t.textToCheck;
+
     $("result-box").querySelector(".result-title").textContent = t.result;
 
-    var correctedTitle = $("corrected-title");
+    const correctedTitle = $("corrected-title");
     if (correctedTitle) correctedTitle.textContent = t.corrected;
-    var issuesTitle = $("issues-title");
+    const issuesTitle = $("issues-title");
     if (issuesTitle) issuesTitle.textContent = t.issues;
 
     if (lang === 'zh') {
@@ -227,15 +303,16 @@
     $("btn-grammar-reset").textContent = t.reset;
 
     document.querySelectorAll('.accordion-item').forEach(function(item) {
-      var content = item.querySelector('.accordion-content');
-      var toggle = item.querySelector('.accordion-toggle');
+      const content = item.querySelector('.accordion-content');
+      const toggle = item.querySelector('.accordion-toggle');
       if (!content || !toggle) return;
-      var isOpen = content.classList.contains('show');
+      const isOpen = content.classList.contains('show');
       toggle.classList.toggle('open', isOpen);
       toggle.textContent = isOpen ? t.collapse : t.expand;
     });
 
     updateXvibeUI();
+    updateGrokCreditUI();
   }
 
   function setMode(mode) {
@@ -245,6 +322,7 @@
     $("tab-translate").classList.toggle("active", mode === "translate");
     $("tab-grammar").classList.toggle("active", mode === "grammar");
     hideResult();
+    updateGrokCreditUI();
     setLang(currentLang);
   }
 
@@ -258,13 +336,15 @@
     if (tone !== 'casual2') {
       resetXvibe();
     }
+    const t = i18n[currentLang];
+    $("tone-toggle-link").textContent = t[tone] || t.natural;
     updateXvibeUI();
   }
 
   function setLoading(show) {
     $("loading").classList.toggle("show", show);
     $("loading-spinner").classList.toggle("show", show);
-    var img = $("loading-img");
+    const img = $("loading-img");
     if (img) {
       img.src = (isXvibe && currentMode === 'translate') ? "loading2.svg" : "thinking.svg";
     }
@@ -275,13 +355,13 @@
   }
 
   function showResult(text, mode) {
-    var body = $("result-body");
-    var t = i18n[currentLang];
+    const body = $("result-body");
+    const t = i18n[currentLang];
     if (mode === 'grammar') {
-      var correctedText = '';
-      var issuesText = '';
-      var correctedIdx = text.indexOf('Corrected:');
-      var issuesIdx = text.indexOf('Issues:');
+      let correctedText = '';
+      let issuesText = '';
+      const correctedIdx = text.indexOf('Corrected:');
+      const issuesIdx = text.indexOf('Issues:');
       if (correctedIdx !== -1) {
         if (issuesIdx !== -1 && issuesIdx > correctedIdx) {
           correctedText = text.substring(correctedIdx + 10, issuesIdx).trim();
@@ -298,26 +378,26 @@
       } else if (!correctedText) {
         correctedText = '✔';
       }
-      var html = '<div class="grammar-section"><div class="grammar-section-title" id="corrected-title">' + escapeHtml(t.corrected) + '</div><div class="grammar-corrected">' + escapeHtml(correctedText) + '</div></div>';
+      let html = '<div class="grammar-section"><div class="grammar-section-title" id="corrected-title">' + escapeHtml(t.corrected) + '</div><div class="grammar-corrected">' + escapeHtml(correctedText) + '</div></div>';
       html += '<div class="grammar-section"><div class="grammar-section-title" id="issues-title">' + escapeHtml(t.issues) + '</div><div class="grammar-issues">' + formatIssues(issuesText) + '</div></div>';
       body.innerHTML = html;
     } else {
-      var html = escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+      const html = escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
       body.innerHTML = html;
     }
     $("result-box").classList.add("show");
   }
 
   function escapeHtml(text) {
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
 
   function formatIssues(text) {
     if (text === 'none' || text === '✔') return '<span class="no-issues">' + text + '</span>';
-    var lines = text.split('\n');
-    var html = '<ul>';
+    const lines = text.split('\n');
+    let html = '<ul>';
     lines.forEach(function(line) {
       line = line.trim();
       if (line && line.charAt(0) === '-') {
@@ -331,16 +411,16 @@
   }
 
   function copyResult() {
-    var correctedEl = document.querySelector('.grammar-corrected');
-    var text = correctedEl ? correctedEl.innerText : $("result-body").innerText;
-    var btn = $("btn-copy");
-    var orig = i18n[currentLang].copy;
+    const correctedEl = document.querySelector('.grammar-corrected');
+    const text = correctedEl ? correctedEl.innerText : $("result-body").innerText;
+    const btn = $("btn-copy");
+    const orig = i18n[currentLang].copy;
     btn.textContent = i18n[currentLang].copied;
     setTimeout(function() { btn.textContent = orig; }, 1500);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text).catch(function() {});
     } else {
-      var ta = document.createElement("textarea");
+      const ta = document.createElement("textarea");
       ta.value = text;
       document.body.appendChild(ta);
       ta.select();
@@ -349,43 +429,49 @@
     }
   }
 
-  async function sendRequest(mode, text, customPrompt) {
+  async function sendRequest(mode, text, customPrompt, context, targetLang) {
     setLoading(true);
     hideResult();
     try {
-      var provider = (mode === 'translate' && isXvibe) ? 'grok' : 'kimi';
-      var res = await fetch("/api/process", {
+      const parts = [];
+      if (targetLang) parts.push('Translate to ' + targetLang + '.');
+      if (customPrompt) parts.push(customPrompt);
+      if (context) parts.push('Context: ' + context);
+      const combinedPrompt = parts.join(' ');
+
+      const provider = (mode === 'translate' && isXvibe) ? 'grok' : 'kimi';
+      const res = await fetch("/api/process", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: mode, text: text, customPrompt: customPrompt, provider: provider })
+        body: JSON.stringify({ mode: mode, text: text, customPrompt: combinedPrompt, provider: provider })
       });
       if (!res.ok) {
-        var errData = await res.json().catch(function() { return {}; });
+        const errData = await res.json().catch(function() { return {}; });
         throw new Error(errData.detail || errData.error || ("HTTP " + res.status));
       }
-      var reader = res.body.getReader();
-      var decoder = new TextDecoder();
-      var buffer = "";
-      var fullText = "";
-      var resultBox = $("result-box");
-      var resultBody = $("result-body");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullText = "";
+      const resultBox = $("result-box");
+      const resultBody = $("result-body");
       resultBody.textContent = "";
       resultBox.classList.add("show");
       while (true) {
-        var chunk = await reader.read();
+        const chunk = await reader.read();
         if (chunk.done) break;
         buffer += decoder.decode(chunk.value, { stream: true });
-        var lines = buffer.split("\n");
+        const lines = buffer.split("\n");
         buffer = lines.pop() || "";
-        for (var i = 0; i < lines.length; i++) {
-          var line = lines[i].trim();
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
           if (!line || line.indexOf("data: ") !== 0) continue;
-          var data = line.slice(6).trim();
+          const data = line.slice(6).trim();
           if (data === "[DONE]") continue;
           try {
-            var json = JSON.parse(data);
+            const json = JSON.parse(data);
             if (json.error) throw new Error(json.error.message || "API Error");
-            var content = (json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content) || "";
+            const content = (json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content) || "";
             if (content) {
               fullText += content;
               resultBody.textContent = fullText;
@@ -409,25 +495,27 @@
   }
 
   function sendTranslate() {
-    var text = $("translate-input").value.trim();
+    const text = $("translate-input").value.trim();
     if (!text) { alert(i18n[currentLang].errorEmpty); return; }
     prompts[currentTone] = $("tone-prompt").value;
-    var customPrompt = $("tone-prompt").value.trim();
-    sendRequest("translate", text, customPrompt);
+    const tonePrompt = $("tone-prompt").value.trim();
+    const context = $("context-input").value.trim();
+    const targetLang = $("target-lang").value.trim();
+    sendRequest("translate", text, tonePrompt, context, targetLang);
   }
 
   function sendGrammar() {
-    var text = $("grammar-input").value.trim();
+    const text = $("grammar-input").value.trim();
     if (!text) { alert(i18n[currentLang].errorEmpty); return; }
     grammarPrompt = $("grammar-prompt").value;
-    var customPrompt = $("grammar-prompt").value.trim();
-    sendRequest("grammar", text, customPrompt);
+    const customPrompt = $("grammar-prompt").value.trim();
+    sendRequest("grammar", text, customPrompt, null, null);
   }
 
   function toggleTheme() {
-    var html = document.documentElement;
-    var current = html.getAttribute("data-theme");
-    var next = current === "dark" ? null : "dark";
+    const html = document.documentElement;
+    const current = html.getAttribute("data-theme");
+    const next = current === "dark" ? null : "dark";
     if (next) {
       html.setAttribute("data-theme", "dark");
       localStorage.setItem("theme", "dark");
@@ -442,7 +530,7 @@
   window.addEventListener('DOMContentLoaded', function() {
     $("tone-prompt").value = prompts.natural;
     $("grammar-prompt").value = grammarPrompt;
-    var savedTheme = localStorage.getItem("theme");
+    const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       document.documentElement.setAttribute("data-theme", "dark");
       $("btn-theme").innerHTML = "&#9790;";
@@ -463,3 +551,4 @@
     setLang("en");
   });
 })();
+
