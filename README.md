@@ -83,11 +83,9 @@ Also includes bilingual UI, dark mode, responsive design, streaming output, Ctrl
 
 ### Screenshots / 页面截图
 
-![footnote](footnote.jpg)
-![_expand](_expand.jpg)
-![_collapse](_collapse.jpg)
-![Chinese_exp](Chinese_exp.jpg)
-![grammar](grammar.jpg)
+| ![footnote](footnote.jpg) | ![expand](_expand.jpg) | ![collapse](_collapse.jpg) | ![Chinese_exp](Chinese_exp.jpg) | ![grammar](grammar.jpg) |
+| :---: | :---: | :---: | :---: | :---: |
+| footnote | expand | default | Chinese mode | grammar |
 
 ---
 
