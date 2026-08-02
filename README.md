@@ -16,6 +16,13 @@
 ---
 
 ```
+07/29/2026 更新：v2.3
+新增术语列表（不止能放术语，类似人名意译这种也行）
+新增翻译历史和retry按钮	
+再次稳定了Grok
+```
+
+```
 07/24/2026 更新：v2.2 
 1. 新增Target language专属输入框，Tone 和 Usage scenario 分家，且默认在界面上折叠
 2. 优化了提示词，有其针对 v2.1 中 Grok 偶尔抽风的毛病。
@@ -55,6 +62,13 @@ The key idea is that you can write prompts to specify exactly how you want thing
 ---
 
 ```
+July 29th, 2026 Update: v2.3
+1.Added a glossary list (not just for terms. also works for charactor names)
+2.Added translation history and a retry button
+3.Stabilized Grok again
+```
+
+```
 Jul 24th,2026 Update: v2.2
 1. Added Target language input and split Tone and Usage scenario into separate fields—both now collapse by default.
 2. Refined the prompts, specifically addressing Grok stability issues from v2.1.
@@ -81,11 +95,13 @@ Also includes bilingual UI, dark mode, responsive design, streaming output, Ctrl
 
 ---
 
-### Screenshots / 页面截图
+### Screenshots(v2.2 screenshots)
 
 | ![footnote](footnote.jpg) | ![expand](_expand.jpg) | ![collapse](_collapse.jpg) | ![Chinese_exp](Chinese_exp.jpg) | ![grammar](grammar.jpg) |
 | :---: | :---: | :---: | :---: | :---: |
 | footnote | expand | default | Chinese mode | grammar |
+
+Latest UI demo (no API hooked up, just the interface>: https://pm-demo.translator-5ry.pages.dev/
 
 ---
 
