@@ -1,4 +1,4 @@
-# "Kimi Translator"is now"PM Translator"!
+## "Kimi Translator"is now"PM Translator"!
 
 (copyright issues...)
 
@@ -14,6 +14,11 @@
 ~~虽然说和自己打开 Kimi/Grok app 问没多大区别~~
 
 ---
+
+```
+09/05/2016 小修改: 翻译所用模型
+K2.5在8月31日下线，故改为K2.6
+```
 
 ```
 07/29/2026 更新：v2.3
@@ -60,6 +65,12 @@ The key idea is that you can write prompts to specify exactly how you want thing
 ~~Though it's not that different from just opening the Kimi/Grok app and asking~~
 
 ---
+
+```
+September 5th, 2026 tiny fix: change the model
+K2.5 was discontinued on August 31st.
+Switched to K2.6.
+```
 
 ```
 July 29th, 2026 Update: v2.3
