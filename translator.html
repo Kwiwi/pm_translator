@@ -3,22 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kimi Translator & Grammar Correction</title>
+  <title>Kimi Translator & Expression Guide</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&family=Noto+Serif+HK:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="../Totsbi192.png">
 </head>
 <body>
+
+  <!-- Modal (Alert only) -->
+  <div id="modal-overlay" class="modal">
+    <div class="modal-box">
+      <p id="modal-message">Message</p>
+      <div class="modal-btns">
+        <button id="modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
 
   <div class="top-bar">
     <div class="lang-bar">
       <button id="btn-zh">中文</button>
       <button id="btn-en">EN</button>
     </div>
-    <button class="theme-btn" id="btn-theme" title="Toggle dark mode">&#9788;</button>
+    <div class="top-right">
+      <button class="settings-btn" id="btn-settings" title="Settings">&#9881;</button>
+      <button class="theme-btn" id="btn-theme" title="Toggle dark mode">&#9788;</button>
+    </div>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settings-panel" class="settings-panel" style="display: none;">
+    <div class="settings-header">
+      <span class="settings-title" id="settings-title">Settings</span>
+      <button class="settings-close" id="settings-close">&times;</button>
+    </div>
+    <div class="settings-row">
+      <span class="sublabel" id="label-api-key">Moonshot API Key</span>
+      <div class="key-input-wrap">
+        <input type="password" id="api-key-input" class="input-text" placeholder="sk-..."
+               inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-secondary" id="btn-toggle-key">Show</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="sublabel" id="label-model">Model</span>
+      <input type="text" id="model-input" class="input-text" placeholder="e.g. kimi-k2.6"
+             inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
+    <p class="settings-hint" id="settings-hint">Stored only in your browser. Sent securely via HTTPS.</p>
+    <div class="settings-actions">
+      <button class="btn" id="btn-save-key">Save</button>
+      <button class="btn-secondary" id="btn-clear-key">Clear</button>
+    </div>
   </div>
 
   <div class="mode-bar">
     <div id="tab-translate" class="mode-tab active">Translate</div>
-    <div id="tab-grammar" class="mode-tab">Grammar Check</div>
+    <div id="tab-grammar" class="mode-tab">Expression Guide</div>
   </div>
 
   <div id="sec-translate" class="section active">
@@ -77,15 +119,36 @@
       <a class="tone-collapse-link" id="tone-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
-    <!-- Context / Usage Scenario (collapsed by default) -->
-    <div class="context-collapsed" id="context-collapsed">
-      <span class="sublabel" id="label-context-prefix">Usage scenario</span>
-      <a class="context-toggle-link" id="context-toggle-link" href="javascript:void(0)">Add context</a>
+    <!-- More / 补充 (collapsed by default) -->
+    <div class="more-collapsed" id="more-collapsed">
+      <span class="sublabel" id="label-more-prefix">More</span>
+      <a class="more-toggle-link" id="more-toggle-link" href="javascript:void(0)">Add notes</a>
     </div>
-    <div class="context-expanded" id="context-expanded" style="display: none;">
-      <div class="label" id="label-context">Usage scenario</div>
-      <textarea id="context-input" class="box-small" placeholder=""></textarea>
-      <a class="context-collapse-link" id="context-collapse-link" href="javascript:void(0)">Collapse</a>
+    <div class="more-expanded" id="more-expanded" style="display: none;">
+      <div class="label" id="label-more">More</div>
+      <textarea id="more-input" class="box-small" placeholder=""></textarea>
+      <div class="input-actions">
+        <button class="btn-secondary" id="btn-more-clear">Clear</button>
+      </div>
+      <a class="more-collapse-link" id="more-collapse-link" href="javascript:void(0)">Collapse</a>
+    </div>
+
+    <!-- Terminology (collapsed by default) -->
+    <div class="term-collapsed" id="term-collapsed">
+      <span class="sublabel" id="label-term-prefix">Terminology</span>
+      <a class="term-toggle-link" id="term-toggle-link" href="javascript:void(0)">Add terms</a>
+    </div>
+    <div class="term-expanded" id="term-expanded" style="display: none;">
+      <div class="label" id="label-term-table">Terminology</div>
+      <div class="term-input-row">
+        <input type="text" id="term-input" class="term-input" placeholder="">
+        <button class="btn-secondary" id="btn-add-term">Add</button>
+      </div>
+      <div class="term-list" id="term-list"></div>
+      <div class="term-actions">
+        <button class="btn-secondary" id="btn-clear-terms">Clear</button>
+      </div>
+      <a class="term-collapse-link" id="term-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
     <!-- Source Text -->
@@ -99,19 +162,20 @@
   </div>
 
   <div id="sec-grammar" class="section">
-    <div class="label" id="label-grammar-prompt">Additional Focus (Optional)</div>
+    <div class="label" id="label-grammar-prompt">Expression goal</div>
     <textarea id="grammar-prompt" class="box-small" placeholder=""></textarea>
-    <div class="input-actions">
+    <div class="grammar-actions">
+      <button class="btn-secondary btn-grammar-only" id="btn-grammar-only">Check grammar only</button>
       <button class="btn-secondary" id="btn-grammar-reset">Reset</button>
     </div>
 
-    <div class="label" id="label-grammar-text">Enter text to check</div>
+    <div class="label" id="label-grammar-text">Enter text to polish</div>
     <textarea id="grammar-input" class="box-large" placeholder=""></textarea>
     <div class="input-actions">
       <button class="btn-secondary" id="btn-grammar-clear">Clear</button>
     </div>
 
-    <button class="btn" id="btn-check">Check</button>
+    <button class="btn" id="btn-check">Guide</button>
   </div>
 
   <div id="loading" class="loading">
@@ -124,9 +188,25 @@
   <div id="result-box" class="result-box">
     <div class="result-header">
       <span class="result-title">Result</span>
-      <button class="copy-btn" id="btn-copy">Copy</button>
+      <div class="result-actions">
+        <button class="copy-btn" id="btn-retry">Retry</button>
+        <button class="copy-btn" id="btn-copy">Copy</button>
+      </div>
+    </div>
+    <div class="retry-feedback" id="retry-feedback" style="display: none;">
+      <textarea id="retry-input" class="retry-input" placeholder=""></textarea>
+      <div class="retry-actions">
+        <button class="btn" id="btn-retry-submit">Regenerate</button>
+        <button class="btn-secondary" id="btn-retry-plain">Retry</button>
+        <button class="btn-secondary" id="btn-retry-cancel">Cancel</button>
+      </div>
     </div>
     <div id="result-body" class="result-body"></div>
+    <div class="history-nav" id="history-nav">
+      <button class="history-btn" id="btn-history-prev">&lt;</button>
+      <span class="history-page" id="history-page">1/1</span>
+      <button class="history-btn" id="btn-history-next">&gt;</button>
+    </div>
   </div>
 
   <div class="footer-section">
@@ -167,7 +247,21 @@
   $("btn-translate").addEventListener("click", I18n.sendTranslate);
   $("btn-check").addEventListener("click", I18n.sendGrammar);
   $("btn-copy").addEventListener("click", I18n.copyResult);
+  $("btn-retry").addEventListener("click", I18n.retry);
   $("btn-theme").addEventListener("click", I18n.toggleTheme);
+  $("btn-retry-submit").addEventListener("click", I18n.submitRetry);
+  $("btn-retry-plain").addEventListener("click", I18n.plainRetry);
+  $("btn-retry-cancel").addEventListener("click", I18n.cancelRetry);
+
+  // Settings panel
+  $("btn-settings").addEventListener("click", function() { I18n.toggleSettings(); });
+  $("settings-close").addEventListener("click", function() { I18n.toggleSettings(); });
+  $("btn-save-key").addEventListener("click", I18n.saveApiKey);
+  $("btn-clear-key").addEventListener("click", I18n.clearApiKey);
+  $("btn-toggle-key").addEventListener("click", I18n.toggleKeyVisibility);
+
+  // Modal
+  $("modal-ok").addEventListener("click", I18n.hideModal);
 
   // Tone expand/collapse
   $("tone-toggle-link").addEventListener("click", function(e) {
@@ -179,15 +273,42 @@
     I18n.toggleToneExpand();
   });
 
-  // Context expand/collapse
-  $("context-toggle-link").addEventListener("click", function(e) {
+  // More expand/collapse
+  $("more-toggle-link").addEventListener("click", function(e) {
     e.preventDefault();
-    I18n.toggleContextExpand();
+    I18n.toggleMoreExpand();
   });
-  $("context-collapse-link").addEventListener("click", function(e) {
+  $("more-collapse-link").addEventListener("click", function(e) {
     e.preventDefault();
-    I18n.toggleContextExpand();
+    I18n.toggleMoreExpand();
   });
+  $("btn-more-clear").addEventListener("click", function() { $("more-input").value = ""; });
+
+  // Terminology expand/collapse
+  $("term-toggle-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleTermExpand();
+  });
+  $("term-collapse-link").addEventListener("click", function(e) {
+    e.preventDefault();
+    I18n.toggleTermExpand();
+  });
+
+  // Add term
+  $("btn-add-term").addEventListener("click", function() {
+    I18n.addTerm($("term-input").value);
+  });
+  $("term-input").addEventListener("keydown", function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      I18n.addTerm($("term-input").value);
+    }
+  });
+  $("btn-clear-terms").addEventListener("click", I18n.clearTerms);
+
+  // History nav
+  $("btn-history-prev").addEventListener("click", I18n.historyPrev);
+  $("btn-history-next").addEventListener("click", I18n.historyNext);
 
   // Tone slider
   document.querySelectorAll(".tone-item").forEach(function(el) {
@@ -245,7 +366,10 @@
   });
   $("btn-grammar-clear").addEventListener("click", function() { $("grammar-input").value = ""; });
   $("btn-grammar-reset").addEventListener("click", function() {
-    $("grammar-prompt").value = I18n.defaultGrammarPrompt;
+    $("grammar-prompt").value = "";
+  });
+  $("btn-grammar-only").addEventListener("click", function() {
+    $("grammar-prompt").value = I18n.grammarOnlyPrompt;
   });
 
   document.querySelectorAll('.accordion-header').forEach(function(header) {
@@ -290,4 +414,3 @@
 
 </body>
 </html>
-
