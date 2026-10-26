@@ -7,16 +7,18 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&family=Noto+Serif+HK:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="../Totsbi192.png">
+  <link rel="icon" type="image/png" href="../my_site/Totsbi192.png">
 </head>
 <body>
 
-  <!-- Modal (Alert only) -->
+  <!-- Modal -->
   <div id="modal-overlay" class="modal">
     <div class="modal-box">
       <p id="modal-message">Message</p>
       <div class="modal-btns">
+        <button id="modal-no" hidden>No</button>
         <button id="modal-ok">OK</button>
+        <button id="modal-yes" hidden>Yes</button>
       </div>
     </div>
   </div>
@@ -27,8 +29,25 @@
       <button id="btn-en">EN</button>
     </div>
     <div class="top-right">
+      <button class="tutorial-btn" id="btn-tutorial" title="How to use">?</button>
       <button class="settings-btn" id="btn-settings" title="Settings">&#9881;</button>
       <button class="theme-btn" id="btn-theme" title="Toggle dark mode">&#9788;</button>
+    </div>
+  </div>
+
+  <div id="tutorial-overlay" class="modal">
+    <div class="modal-box tutorial-box">
+      <div class="settings-header"><span id="tutorial-title">How to Use</span><button class="settings-close" id="tutorial-close">&times;</button></div>
+      <div id="tutorial-content" class="tutorial-content"></div>
+      <div class="modal-btns"><button id="tutorial-ok">OK</button></div>
+    </div>
+  </div>
+
+  <div id="personal-credit-overlay" class="modal">
+    <div class="modal-box tutorial-box">
+      <div class="settings-header"><span id="personal-credit-title">Personal credit</span><button class="settings-close" id="personal-credit-close">&times;</button></div>
+      <div class="tutorial-content">testing...</div>
+      <div class="modal-btns"><button id="personal-credit-ok">OK</button></div>
     </div>
   </div>
 
@@ -39,15 +58,28 @@
       <button class="settings-close" id="settings-close">&times;</button>
     </div>
     <div class="settings-row">
-      <span class="sublabel" id="label-api-key">Moonshot API Key</span>
+      <span class="sublabel" id="label-moonshot-key">Moonshot API Key</span>
       <div class="key-input-wrap">
-        <input type="password" id="api-key-input" class="input-text" placeholder="sk-..."
-               inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        <button class="btn-secondary" id="btn-toggle-key">Show</button>
+        <input type="password" id="moonshot-key-input" class="input-text" placeholder="sk-..." inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-secondary key-toggle" data-key-provider="moonshot">Show</button>
       </div>
     </div>
     <div class="settings-row">
-      <span class="sublabel" id="label-model">Model</span>
+      <span class="sublabel" id="label-openai-key">OpenAI API Key</span>
+      <div class="key-input-wrap">
+        <input type="password" id="openai-key-input" class="input-text" placeholder="sk-..." inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-secondary key-toggle" data-key-provider="openai">Show</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="sublabel" id="label-anthropic-key">Anthropic API Key</span>
+      <div class="key-input-wrap">
+        <input type="password" id="anthropic-key-input" class="input-text" placeholder="sk-ant-..." inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <button class="btn-secondary key-toggle" data-key-provider="anthropic">Show</button>
+      </div>
+    </div>
+    <div class="settings-row">
+      <span class="sublabel" id="label-model">Moonshot model</span>
       <input type="text" id="model-input" class="input-text" placeholder="e.g. kimi-k2.6"
              inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </div>
@@ -112,10 +144,7 @@
       </div>
       <div class="label" id="label-tone-instructions">Instructions (Editable)</div>
       <textarea id="tone-prompt" class="box-small" placeholder=""></textarea>
-      <div class="input-actions">
-        <a class="x-vibe-btn" id="btn-x-vibe" href="javascript:void(0)"></a>
-        <button class="btn-secondary" id="btn-reset">Reset</button>
-      </div>
+      <div class="prompt-tools"><select id="tone-prompt-list" class="prompt-list"></select><button class="btn-secondary" id="btn-tone-save">+</button><a class="x-vibe-btn" id="btn-x-vibe" href="javascript:void(0)"></a><button class="btn-secondary" id="btn-reset">Reset</button></div>
       <a class="tone-collapse-link" id="tone-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
@@ -127,9 +156,7 @@
     <div class="more-expanded" id="more-expanded" style="display: none;">
       <div class="label" id="label-more">More</div>
       <textarea id="more-input" class="box-small" placeholder=""></textarea>
-      <div class="input-actions">
-        <button class="btn-secondary" id="btn-more-clear">Clear</button>
-      </div>
+      <div class="prompt-tools"><select id="more-prompt-list" class="prompt-list"></select><button class="btn-secondary" id="btn-more-save">+</button><button class="btn-secondary" id="btn-more-clear">Clear</button></div>
       <a class="more-collapse-link" id="more-collapse-link" href="javascript:void(0)">Collapse</a>
     </div>
 
@@ -158,12 +185,13 @@
       <button class="btn-secondary" id="btn-clear">Clear</button>
     </div>
 
-    <button class="btn" id="btn-translate">Translate</button>
+    <div class="primary-actions"><button class="request-settings-btn" data-options-mode="translate" title="Request options" aria-label="Request options">&#9881;</button><button class="btn" id="btn-translate">Translate</button></div>
   </div>
 
   <div id="sec-grammar" class="section">
     <div class="label" id="label-grammar-prompt">Expression goal</div>
     <textarea id="grammar-prompt" class="box-small" placeholder=""></textarea>
+    <div class="prompt-tools"><select id="grammar-prompt-list" class="prompt-list"></select><button class="btn-secondary" id="btn-grammar-save">+</button></div>
     <div class="grammar-actions">
       <button class="btn-secondary btn-grammar-only" id="btn-grammar-only">Check grammar only</button>
       <button class="btn-secondary" id="btn-grammar-reset">Reset</button>
@@ -175,7 +203,7 @@
       <button class="btn-secondary" id="btn-grammar-clear">Clear</button>
     </div>
 
-    <button class="btn" id="btn-check">Guide</button>
+    <div class="primary-actions"><button class="request-settings-btn" data-options-mode="grammar" title="Request options" aria-label="Request options">&#9881;</button><button class="btn" id="btn-check">Guide</button></div>
   </div>
 
   <div id="loading" class="loading">
@@ -185,44 +213,23 @@
     <div class="loading-text" id="loading-text"></div>
   </div>
 
+  <div id="request-options" class="request-options" hidden>
+    <div class="options-heading"><strong id="options-title">Request options</strong><button class="settings-close" id="options-close">&times;</button></div>
+    <div class="options-count-row"><span id="options-count-label">Requests</span><div class="options-count-controls"><div class="segmented" id="request-count-segment"><button type="button" data-count="1">1</button><button type="button" data-count="2">2</button></div><button class="options-help" id="options-help" type="button" aria-label="Request options help">?</button></div></div>
+    <div id="request-blocks"></div>
+    <button class="btn" id="options-ok">OK</button>
+  </div>
+
   <div id="result-box" class="result-box">
-    <div class="result-header">
-      <span class="result-title">Result</span>
-      <div class="result-actions">
-        <button class="copy-btn" id="btn-retry">Retry</button>
-        <button class="copy-btn" id="btn-copy">Copy</button>
-      </div>
-    </div>
-    <div class="retry-feedback" id="retry-feedback" style="display: none;">
-      <textarea id="retry-input" class="retry-input" placeholder=""></textarea>
-      <div class="retry-actions">
-        <button class="btn" id="btn-retry-submit">Regenerate</button>
-        <button class="btn-secondary" id="btn-retry-plain">Retry</button>
-        <button class="btn-secondary" id="btn-retry-cancel">Cancel</button>
-      </div>
-    </div>
+    <div class="result-header"><span class="result-title" id="result-title">Result</span></div>
     <div id="result-body" class="result-body"></div>
-    <div class="history-nav" id="history-nav">
-      <button class="history-btn" id="btn-history-prev">&lt;</button>
-      <span class="history-page" id="history-page">1/1</span>
-      <button class="history-btn" id="btn-history-next">&gt;</button>
-    </div>
   </div>
 
   <div class="footer-section">
-    <div class="accordion-item">
-      <div class="accordion-header" id="usage-header">
-        <span class="sublabel" id="footer-usage-label">How to Use</span>
-        <span class="accordion-toggle">Expand</span>
-      </div>
-      <div class="accordion-content" id="footer-usage-text"></div>
-    </div>
-    <div class="accordion-item">
-      <div class="accordion-header" id="troubleshoot-header">
-        <span class="sublabel" id="footer-troubleshoot-label">Troubleshoot</span>
-        <span class="accordion-toggle">Expand</span>
-      </div>
-      <div class="accordion-content" id="footer-troubleshoot-text"></div>
+    <div class="history-controls">
+      <div class="history-header"><span class="sublabel" id="history-title">History</span><div id="history-undo" class="history-undo" hidden><span id="undo-message" hidden>Undo</span><button class="history-undo-btn" id="btn-undo" type="button" title="Undo" aria-label="Undo">↩</button></div><div class="history-tools"><select id="history-version" class="history-version" hidden></select><button class="btn-secondary" id="btn-history-clear">Clear all</button></div></div>
+      <div id="history-nav" class="history-nav"><button class="history-btn" id="btn-history-prev">&lt;</button><span class="history-page" id="history-page">1/1</span><button class="history-btn" id="btn-history-next">&gt;</button></div>
+      <div id="history-list" class="history-list"></div>
     </div>
     <div class="accordion-item">
       <div class="accordion-header" id="credits-header">
@@ -246,22 +253,62 @@
   $("tab-grammar").addEventListener("click", function() { I18n.setMode("grammar"); });
   $("btn-translate").addEventListener("click", I18n.sendTranslate);
   $("btn-check").addEventListener("click", I18n.sendGrammar);
-  $("btn-copy").addEventListener("click", I18n.copyResult);
-  $("btn-retry").addEventListener("click", I18n.retry);
   $("btn-theme").addEventListener("click", I18n.toggleTheme);
-  $("btn-retry-submit").addEventListener("click", I18n.submitRetry);
-  $("btn-retry-plain").addEventListener("click", I18n.plainRetry);
-  $("btn-retry-cancel").addEventListener("click", I18n.cancelRetry);
+  $("btn-tutorial").addEventListener("click", I18n.showTutorial);
+  $("tutorial-close").addEventListener("click", I18n.hideTutorial);
+  $("tutorial-ok").addEventListener("click", I18n.hideTutorial);
+  $("personal-credit-close").addEventListener("click", I18n.hidePersonalCredit);
+  $("personal-credit-ok").addEventListener("click", I18n.hidePersonalCredit);
+  $("btn-history-clear").addEventListener("click", I18n.clearHistory);
+  $("btn-history-prev").addEventListener("click", I18n.historyPrev);
+  $("btn-history-next").addEventListener("click", I18n.historyNext);
+  $("btn-undo").addEventListener("click", I18n.undoHistory);
+  document.querySelectorAll("[data-options-mode]").forEach(function(button) {
+    button.addEventListener("click", function() { I18n.toggleRequestOptions(this.getAttribute("data-options-mode"), this); });
+  });
+  $("options-close").addEventListener("click", I18n.closeRequestOptions);
+  $("options-ok").addEventListener("click", I18n.saveRequestOptions);
+  $("btn-tone-save").addEventListener("click", function() { I18n.saveCustomPrompt("tone"); });
+  $("btn-more-save").addEventListener("click", function() { I18n.saveCustomPrompt("more"); });
+  $("btn-grammar-save").addEventListener("click", function() { I18n.saveCustomPrompt("grammar"); });
+  ["tone", "more", "grammar"].forEach(function(kind) {
+    $(kind + "-prompt-list").addEventListener("change", function() { I18n.applyCustomPrompt(kind, this.value); });
+  });
+  $("result-box").addEventListener("click", function(event) { I18n.handleResultAction(event); });
+  $("result-box").addEventListener("input", function(event) {
+    if (event.target.classList.contains('guide-input')) {
+      var send = event.target.parentElement.querySelector('[data-action="guide-send"]');
+      if (send) send.disabled = !event.target.value.trim();
+    }
+  });
+  $("history-version").addEventListener("change", function(event) { I18n.handleResultAction(event); });
+  $("history-list").addEventListener("click", function(event) { I18n.handleHistoryAction(event); });
+  $("footer-credits-text").addEventListener("click", function(event) {
+    if (event.target.closest('[data-personal-credit]')) {
+      event.preventDefault();
+      $("personal-credit-overlay").classList.add('show');
+    }
+  });
 
   // Settings panel
   $("btn-settings").addEventListener("click", function() { I18n.toggleSettings(); });
   $("settings-close").addEventListener("click", function() { I18n.toggleSettings(); });
   $("btn-save-key").addEventListener("click", I18n.saveApiKey);
   $("btn-clear-key").addEventListener("click", I18n.clearApiKey);
-  $("btn-toggle-key").addEventListener("click", I18n.toggleKeyVisibility);
+  document.querySelectorAll('.key-toggle').forEach(function(button) {
+    button.addEventListener('click', function() { I18n.toggleKeyVisibility(this.getAttribute('data-key-provider')); });
+  });
+  $("options-help").addEventListener("click", I18n.showRequestOptionsHelp);
+  document.querySelectorAll('#request-count-segment button').forEach(function(button) {
+    button.addEventListener('click', function() { I18n.setRequestCount(Number(this.getAttribute('data-count'))); });
+  });
+  $("request-blocks").addEventListener('change', I18n.handleRequestOptionChange);
+  $("request-blocks").addEventListener('click', I18n.handleRequestOptionChange);
 
   // Modal
   $("modal-ok").addEventListener("click", I18n.hideModal);
+  $("modal-no").addEventListener("click", I18n.resolveModalNo);
+  $("modal-yes").addEventListener("click", I18n.resolveModalYes);
 
   // Tone expand/collapse
   $("tone-toggle-link").addEventListener("click", function(e) {
@@ -305,10 +352,6 @@
     }
   });
   $("btn-clear-terms").addEventListener("click", I18n.clearTerms);
-
-  // History nav
-  $("btn-history-prev").addEventListener("click", I18n.historyPrev);
-  $("btn-history-next").addEventListener("click", I18n.historyNext);
 
   // Tone slider
   document.querySelectorAll(".tone-item").forEach(function(el) {
@@ -393,6 +436,12 @@
       }
     }
   });
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function() {});
+    });
+  }
 
   if (window.matchMedia) {
     var mq = window.matchMedia('(prefers-color-scheme: dark)');

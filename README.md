@@ -1,150 +1,84 @@
-## "Kimi Translator" is now "PM Translator"!
-
-(copyright issues...)
-
-*this page was polished by Kimi
-
 <details>
 <summary>中文版</summary>
 
-一个简洁的在线翻译与表达指导工具，基于 Moonshot API + xAI Grok API + Cloudflare Pages 实现。
 
-核心思路是：你可以直接写提示词，要求模型怎么翻译，或者把你的文本润色成什么风格。
+为解决许多翻译器不能指定如何翻译的问题，pm_translator 的特色是可以自己说明要求、调整语气、指定方向重试。同时有一个“表达指导”，可以和模型简单地对话，以调整自己的表达措辞
 
-~~虽然说和自己打开 Kimi/Grok app 问没多大区别~~
+## 目前功能（v2.5.1）
 
----
+### 通用功能：
+1.设置自己的API KEY
+注：我这边是完全看不到的，我又没有数据库存用户记录。它是用浏览器缓存在本地保存的。
+2.历史记录和常用prompt保存
+3.指定一次产生多少个结果、调用什么模型和是否需要翻译/修改的理由
+注：页面顶部的教程是旧版本的，还没写好，下次会修。
 
-### 功能
+### Translator(翻译器)主要有：
+1.指定语气
+  有随意到正式的5个档位，也可以自己改
+2.其他要求
+  有别的什么要求，或者想说明语用场景可以写在这里
+3.术语表
+  指定不用翻译、或者有特定译法的词句
 
-- **多语翻译**：支持任意语言互译。目标语言会根据界面语言预填：中文界面默认译为英文，英文界面默认译为中文；也可以自行改为日语、法语等其他语言。
-- **表达指导**：根据你描述的表达效果润色文本，同时尽量保留原意与风格；点击"只查语法"可切换为最小改动的语法检查模式。
-- **语气档位**：预设有五种语气（随意 I / 随意 II / 自然 / 正式 I / 正式 II），每个档位的提示词都可以直接编辑。
-- **使用场景**：补充上下文（如"发给导师的邮件""安慰朋友的消息"），让翻译更贴合情境。
-- **"X vibe" 模式**：在 Casual II 档位下，点击"想要 X 味翻译？看这里！"会调用 Grok 模型，输出更地道、更有网络感的 casual 翻译。
+### Expression Guide(表达指导)主要有：
+1.指定自己想要达到的表达效果，或者只修语法
+2.与AI展开简短的对话，如果你对它的修改有疑问可以提出来。
 
-另外还支持双语界面、夜间模式、响应式布局、流式输出、Ctrl+Enter 快捷提交、自定义 Kimi 模型名等。
+## 页面截图（部分功能）
 
----
+| day | night |
+| :---: | :---: |
+| ![](./day.jpg) | ![](./night.jpg) |
 
-```
-09/13/2026 更新：v2.4
-1. 使用了更详细的报错
-2. 新增 BYOK：支持自定义 Moonshot API Key 和模型
-3. 将「语法纠错」改为「表达指导」
-```
+可以在这里直接使用PM Translator：https://translator-5ry.pages.dev/translator
 
-</details>
-
----
-
-Two main features: multilingual translation and expression guidance.
-
-Built using Moonshot API, xAI Grok API, and Cloudflare Pages.
-
-The key idea is that you can write prompts to specify exactly how you want things translated or how you want your text polished.
-
-~~Though it's not that different from just opening the Kimi/Grok app and asking~~
-
----
-
-### Features
-
-- **Translation**: Supports any-language translation. The target language is prefilled based on UI language: Chinese UI defaults to English, English UI defaults to Chinese. You can also change it to Japanese, French, etc.
-- **Expression Guide**: Polishes your text according to the expression effect you describe, while preserving the original meaning and style. Click "Check grammar only" to switch to a minimal grammar-checking mode.
-- **Tone Presets**: Five editable tones (Casual I / Casual II / Natural / Formal I / Formal II).
-- **Usage Scenario**: Add context (e.g. "email to supervisor", "comforting a friend") for more accurate translations.
-- **"X vibe" Mode**: On Casual II, click "want that X vibe?" to switch to Grok for a more authentic, internet-style casual translation.
-
-Also includes bilingual UI, dark mode, responsive design, streaming output, Ctrl+Enter quick submit, and a customizable Kimi model name in settings.
-
----
-
-```
-September 13th, 2026 Update: v2.4
-1. More detailed error messages
-2. Added BYOK: support for custom Moonshot API Key and model
-3. Renamed Grammar Correction to Expression Guide
-```
-
----
-
-Latest UI demo (no API hooked up, just the interface): https://demo.translator-5ry.pages.dev/translator
-
----
-
-### License
-
-MIT License
-MIT 协议
-
----
-
-### Credits / 鸣谢
-
-- [Moonshot AI](https://www.moonshot.cn) (Kimi K2.6) — Translation & expression engine
-- [xAI](https://x.ai) (Grok) — "X vibe" casual translation engine
-- GPT-5.5 / GPT-5.6 Luna — System prompts & design philosophy
-- User — Design philosophy & UI design
-
----
-
-<details>
-<summary>Deployment Guide / 部署指南</summary>
-
-`Kimi 写的——我懒得改了`
-`A deployment guide by Kimi, written specifically for beginners`
-
-## 技术栈 / Tech Stack
-
-| 层级 / Layer | 技术 / Technology |
-|:---:|:---:|
-| 前端 / Frontend | Vanilla HTML + CSS + JS |
-| 后端 / Backend | Cloudflare Pages `_worker.js` |
-| AI 接口 / AI API | Moonshot Kimi API (`kimi-k2.6`) + xAI Grok API |
-
-## 部署 / Deployment
-
-### 1. 准备文件 / Prepare Files
-
-```
-your-project/
-├── _worker.js        # 后端 API 代理 / Backend API proxy
-├── translator.html   # 前端界面 / Frontend interface
-├── i18n.js           # 国际化 / i18n
-├── style.css         # 样式 / Styles
-├── index.html        # 现有主页（可选）/ Your existing homepage (optional)
-├── loading2.svg      # Grok 模式的等待动画 / Loading animation for Grok mode
-└── thinking.svg      # 普通等待动画 / Normal loading animation
-```
-
-### 2. 上传到 Cloudflare Pages / Upload to Cloudflare Pages
-
-1. 打开 [Cloudflare Dashboard](https://dash.cloudflare.com) → Pages → Create a project
-2. **上传文件** / **Upload your files**（拖拽上传 / drag & drop）
-3. 点击部署 / Deploy
-
-### 3. 设置环境变量 / Set Environment Variables
-
-Pages Project → Settings → Environment variables:
-
-| 变量 / Variable | 值 / Value |
-|:---:|:---:|
-| `KIMI_API_KEY` | 你的 Moonshot API 密钥，以 `sk-` 开头 / Your Moonshot API key (starts with `sk-`) |
-| `GROK_API_KEY` | 你的 xAI API 密钥 / Your xAI API key |
-
-### 4. 设置兼容性日期 / Set Compatibility Date
-
-Pages Project → Settings → Functions → Compatibility date:
-
-- 生产环境 / Production: `2026-05-14`（或最新可用日期 / or latest available）
-
-保存后重新部署 / Save and redeploy.
-
-### 5. 访问 / Visit
-
-```
-https://your-project.pages.dev/translator.html
-```
+注：还没有默认的Anthropic API KEY，调用Claude时要先自己设置API KEY，在页面顶部。
 
 </details>
+
+Most translation tools give me a translation, but not much control over how it’s phrased...
+
+So PM Translator lets you describe what you want, adjust the tone, retry with specific instructions, etc. It also includes an Expression Guide, where you can have a simple chat with the model to come up with the best wording.
+
+## Current Features (v2.5.1)
+
+### General features
+
+1. Bring Your Own Key
+   You can set your own API key.
+   🟢Note: I can’t see them at all because I don’t have a database storing user info😇. They're saved locally in your browser cache.
+
+2. Save translation history and frequently used prompts
+
+3. Choose how many results to generate, which model to use, and whether to include reasons for the translation or edits  
+   ‼️Note: The tutorial at the top of the page is from an older version and hasn’t been updated yet. I’ll fix it next time.
+
+### *Translator* features
+
+1. Choose the tone  
+   From casual to formal. 5 tones. You can customize them too.
+
+2. More (=additional requirements)
+   Put any other requirements here, or describe the context if you like.
+
+3. Glossary  
+   Specify words or phrases that shouldn’t be translated, or that should use a particular translation.
+
+### Expression Guide features
+
+1. Describe the kind of expression you’re aiming for, or just ask it to fix the grammar.
+
+2. Have a short conversation with the AI  
+   If you’re not sure about its edits, just ask about it.
+
+## some screenshots
+
+| day | night |
+| :---: | :---: |
+| ![](./day.jpg) | ![](./night.jpg)
+
+🟢You can use PM Translator here!:https://translator-5ry.pages.dev/translator
+
+⚙️Note: No default Anthropic API key yet. If you want to use Claude, set your own API key (at the top of the page).
+
