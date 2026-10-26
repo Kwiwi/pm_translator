@@ -1,7 +1,6 @@
 <details>
 <summary>中文版</summary>
 
-
 为解决许多翻译器不能指定如何翻译的问题，pm_translator 的特色是可以自己说明要求、调整语气、指定方向重试。同时有一个“表达指导”，可以和模型简单地对话，以调整自己的表达措辞
 
 ## 目前功能（v2.5.1）
@@ -15,11 +14,11 @@
 
 ### Translator(翻译器)主要有：
 1.指定语气
-  有随意到正式的5个档位，也可以自己改
+  有随意到正式的5个档位，也可以自己改
 2.其他要求
-  有别的什么要求，或者想说明语用场景可以写在这里
+  有别的什么要求，或者想说明语用场景可以写在这里
 3.术语表
-  指定不用翻译、或者有特定译法的词句
+  指定不用翻译、或者有特定译法的词句
 
 ### Expression Guide(表达指导)主要有：
 1.指定自己想要达到的表达效果，或者只修语法
@@ -46,31 +45,31 @@ So PM Translator lets you describe what you want, adjust the tone, retry with sp
 ### General features
 
 1. Bring Your Own Key
-   You can set your own API key.
-   🟢Note: I can’t see them at all because I don’t have a database storing user info😇. They're saved locally in your browser cache.
+   You can set your own API key.
+   🟢Note: I can’t see them at all because I don’t have a database storing user info😇. They're saved locally in your browser cache.
 
 2. Save translation history and frequently used prompts
 
-3. Choose how many results to generate, which model to use, and whether to include reasons for the translation or edits  
-   ‼️Note: The tutorial at the top of the page is from an older version and hasn’t been updated yet. I’ll fix it next time.
+3. Choose how many results to generate, which model to use, and whether to include reasons for the translation or edits
+   ‼️Note: The tutorial at the top of the page is from an older version and hasn’t been updated yet. I’ll fix it next time.
 
 ### *Translator* features
 
-1. Choose the tone  
-   From casual to formal. 5 tones. You can customize them too.
+1. Choose the tone
+   From casual to formal. 5 tones. You can customize them too.
 
 2. More (=additional requirements)
-   Put any other requirements here, or describe the context if you like.
+   Put any other requirements here, or describe the context if you like.
 
-3. Glossary  
-   Specify words or phrases that shouldn’t be translated, or that should use a particular translation.
+3. Glossary
+   Specify words or phrases that shouldn’t be translated, or that should use a particular translation.
 
 ### Expression Guide features
 
 1. Describe the kind of expression you’re aiming for, or just ask it to fix the grammar.
 
-2. Have a short conversation with the AI  
-   If you’re not sure about its edits, just ask about it.
+2. Have a short conversation with the AI
+   If you’re not sure about its edits, just ask about it.
 
 ## some screenshots
 
